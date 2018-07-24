@@ -33,5 +33,5 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-INCLUDEPATH += E:\Code\opencv\opencv\build\include;
-LIBS += E:\Code\opencv\opencv\build\x64\vc15\lib\*.lib;
+INCLUDEPATH += E:\Code\opencv\opencv\build\include
+LIBS += E:\Code\opencv\opencv\build\x64\vc15\lib\*.lib
