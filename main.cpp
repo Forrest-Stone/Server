@@ -1,4 +1,16 @@
-﻿#include "mainwindow.h"
+﻿/**
+  ---------------------------------------------------------
+  * @projectName  项目名：Server
+  * @file         文件名：main.cpp
+  * @author       著作权所有者: 张岩森
+  * @brief        内容: 主函数
+  * @date         作成日期: 2018-07-27 14:48:34 周五
+  * @date         修正日期：2018-07-27 14:48:34 周五
+  ---------------------------------------------------------
+  * */
+#pragma execution_character_set("utf-8")
+
+#include "mainwindow.h"
 #include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <QStringList>
@@ -7,7 +19,7 @@
 #include <QSqlDatabase>
 #include <QTextCodec>
 
-#pragma execution_character_set("utf-8")
+#include "tcpserver.h"
 
 using namespace cv;
 
@@ -40,14 +52,17 @@ int main(int argc, char *argv[])
 
     }
 
-    VideoCapture capture(0);
-    // 循环显示每一帧
-    while(1) {
-        Mat frame;  // 定义一个Mat变量，用于存储每一帧的图像
-        capture>>frame;  // 读取当前帧
-        imshow("video",frame);  // 显示当前帧
-        waitKey(30);  // 延时30ms
-    }
+
+//    TcpServer server;
+//    server.Start(8675, 2);
+//    VideoCapture capture(0);
+//    // 循环显示每一帧
+//    while(1) {
+//        Mat frame;  // 定义一个Mat变量，用于存储每一帧的图像
+//        capture>>frame;  // 读取当前帧
+//        imshow("video",frame);  // 显示当前帧
+//        waitKey(30);  // 延时30ms
+//    }
 
     return a.exec();
 }
