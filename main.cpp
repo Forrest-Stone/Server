@@ -19,7 +19,7 @@
 #include <QSqlDatabase>
 #include <QTextCodec>
 
-#include "tcpserver.h"
+#include "receive_tcpserver.h"
 
 using namespace cv;
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     // 创建连接，使用本地的 MySQL
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
-    db.setDatabaseName("mysql");
+    db.setDatabaseName("car");
     db.setPort(3306);
     db.setUserName("zys");
     db.setPassword("zyszuibang");

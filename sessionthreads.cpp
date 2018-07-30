@@ -27,7 +27,7 @@ bool SessionThreads::Start(uint32_t threadNum)
         return true;
     }
     for(uint32_t i = 0; i < threadNum; ++i) {
-        TcpThread *thread = new TcpThread();
+        Receive_TcpThread *thread = new Receive_TcpThread();
         threadList_.push_back(thread);
         thread->start();
     }
@@ -51,24 +51,23 @@ void SessionThreads::Stop()
     if(isRunning_) {
         return ;
     }
-//    QMutexLocker locker(&lock_);
     // 先关闭已有连接
     lock_guard<mutex> locker(this->lock_);
-    unordered_map<void*, shared_ptr<TcpSession>>::iterator itor = sessionList_.begin();
+    unordered_map<void*, shared_ptr<Receive_TcpSession>>::iterator itor = sessionList_.begin();
     // 关闭连接
     for(itor = sessionList_.begin(); itor != sessionList_.end(); ++itor) {
-        shared_ptr<TcpSession> session = itor->second;
+        shared_ptr<Receive_TcpSession> session = itor->second;
         if(session.get()) {
-            disconnect(session.get(), &TcpSession::SignalDisConnected,
+            disconnect(session.get(), &Receive_TcpSession::SignalDisConnected,
                        this, &SessionThreads::SlotSessionDisConnected);
             session.get()->Disconnect();
         }
     }
-    for(TcpThread *thread : this->threadList_) {
+    for(Receive_TcpThread *thread : this->threadList_) {
         thread->exit();
         thread->wait();
     }
-    for(TcpThread *thread : this->threadList_) {
+    for(Receive_TcpThread *thread : this->threadList_) {
        delete thread;
     }
     this->threadList_.clear();
@@ -87,11 +86,11 @@ void SessionThreads::Stop()
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-TcpThread *SessionThreads::PickMinThread()
+Receive_TcpThread *SessionThreads::PickMinThread()
 {
-    TcpThread *thread = nullptr;
+    Receive_TcpThread *thread = nullptr;
     uint32_t minCount = 0;
-    for(TcpThread *tmpThread : this->threadList_)
+    for(Receive_TcpThread *tmpThread : this->threadList_)
     {
         uint32_t tmpCount = tmpThread->sessionCount;
         if(minCount == 0 || tmpCount < minCount)
@@ -117,7 +116,7 @@ TcpThread *SessionThreads::PickMinThread()
 vector<uint32_t> SessionThreads::GetSessionSize() const
 {
     vector<uint32_t> vec;
-    for(TcpThread *thread : this->threadList_) {
+    for(Receive_TcpThread *thread : this->threadList_) {
         vec.push_back(thread->sessionCount);
     }
     return vec;
@@ -134,9 +133,9 @@ vector<uint32_t> SessionThreads::GetSessionSize() const
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-void SessionThreads::AddSession(shared_ptr<TcpSession> &session)
+void SessionThreads::AddSession(shared_ptr<Receive_TcpSession> &session)
 {
-    connect(session.get(), &TcpSession::SignalDisConnected,
+    connect(session.get(), &Receive_TcpSession::SignalDisConnected,
             this, &SessionThreads::SlotSessionDisConnected,
             Qt::QueuedConnection);
     // 加锁
@@ -149,7 +148,7 @@ void SessionThreads::SlotSessionDisConnected(void *id)
 {
     // 加锁
     lock_guard<mutex> locker(this->lock_);
-    unordered_map<void*, shared_ptr<TcpSession>>::iterator itor = sessionList_.begin();
+    unordered_map<void*, shared_ptr<Receive_TcpSession>>::iterator itor = sessionList_.begin();
     itor = sessionList_.find(id);
     if(itor != sessionList_.end())
     {

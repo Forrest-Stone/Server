@@ -13,7 +13,7 @@
 
 #include <QMainWindow>
 
-#include "tcpserver.h"
+#include "receive_tcpserver.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,10 +30,9 @@ public:
 private slots:
     void on_pushButton_clicked();
 
-//    void AcceptSession(std::shared_ptr<TcpSession> &tcpSession);
 private:
     Ui::MainWindow *ui;
-    TcpServer *server_ = nullptr;
+    Receive_TcpServer *server_ = nullptr;
     void Write(const QString &msg);
 };
 

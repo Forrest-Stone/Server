@@ -8,8 +8,8 @@
   * @date         修正日期：2018-07-27 14:46:43 周五
   ---------------------------------------------------------
   * */
-#ifndef TCPSERVER_H
-#define TCPSERVER_H
+#ifndef RECEIVE_TCPSERVER_H
+#define RECEIVE_TCPSERVER_H
 
 #include <QObject>
 #include <QTcpServer>
@@ -17,8 +17,6 @@
 #include <memory>
 
 #include "sessionthreads.h"
-//#include "tcpsession.h"
-//#include "tcpthread.h"
 
 #define PORTNUM 8888
 
@@ -39,13 +37,14 @@ struct ServerData
     }
 };
 
-class TcpServer : public QTcpServer
+class Receive_TcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit TcpServer(QObject *parent = nullptr);
+//    Receive_TcpServer() = default;
+    explicit Receive_TcpServer(QObject *parent = nullptr);
+    ~Receive_TcpServer();
 
-    ~TcpServer();
     // 启动服务器
     bool Start(ServerData &conf);
     // 关闭服务器
@@ -57,20 +56,17 @@ public:
 
 public:
     //新连接回调
-    function<void(shared_ptr<TcpSession> &)> OnAccepted = nullptr;
+    function<void(shared_ptr<Receive_TcpSession> &)> OnAccepted = nullptr;
 
-signals:
-
-public slots:
 protected:
     // 虚函数 接收 TCP 请求
     virtual void incomingConnection(qintptr socketDescriptor);
     // 创建会话
-    shared_ptr<TcpSession> CreateSession(qintptr handle);
+    shared_ptr<Receive_TcpSession> CreateSession(qintptr handle);
 
 private:
     bool isRunning_ = false;
     SessionThreads sessionThreads_;
 };
 
-#endif // TCPSERVER_H
+#endif // RECEIVE_TCPSERVER_H

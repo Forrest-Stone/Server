@@ -16,9 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    server_ = new TcpServer();
-    //    Server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
-    //    server_->OnAccepted = std::bind()
+    server_ = new Receive_TcpServer();
 }
 
 MainWindow::~MainWindow()
@@ -26,21 +24,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::AcceptSession(std::shared_ptr<NetAPI::TcpSession> &tcpSession)
-//{
-//    SessionInfo *info = this->SessionList_.NewSessionInfo(tcpSession);
-//    connect(info, &SessionInfo::SignalDisconnect, this, &MainWindow::SlotDisConnected);
-//    connect(info, &SessionInfo::SignalRead, this, &MainWindow::SlotRead);
-//    this->WriteLog("Accept One");
-//}
-
 void MainWindow::on_pushButton_clicked()
 {
     uint16_t port = ui->lineEdit_2->text().toInt();
     ServerData serverData;
     serverData.portNum = port;
     if(server_->Start(serverData)) {
-//        qDebug() << serverData.portNum << " " << serverData.threadNum;
         this->Write("Start Successful!");
     } else {
         this->Write("Could Not Start Server!");

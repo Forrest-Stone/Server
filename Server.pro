@@ -29,20 +29,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    tcpserver.cpp \
-    tcpsession.cpp \
     sessionthreads.cpp \
-    tcpthread.cpp
+    receive_tcpserver.cpp \
+    receive_tcpthread.cpp \
+    receive_tcpsession.cpp
 
 HEADERS += \
         mainwindow.h \
-    tcpserver.h \
-    tcpsession.h \
     sessionthreads.h \
-    tcpthread.h
+    receive_tcpserver.h \
+    receive_tcpthread.h \
+    receive_tcpsession.h
 
 FORMS += \
         mainwindow.ui
 
-INCLUDEPATH += E:\Code\opencv\opencv\build\include
-LIBS += E:\Code\opencv\opencv\build\x64\vc15\lib\*.lib
+#INCLUDEPATH += E:\Code\opencv\opencv\build\include
+#LIBS += E:\Code\opencv\opencv\build\x64\vc15\lib\*.lib

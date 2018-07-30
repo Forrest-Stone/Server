@@ -17,11 +17,9 @@
 #include <stdint.h>
 #include <memory>
 #include <mutex>
-#include <QMutex>
-#include <QMutexLocker>
 
-#include "tcpthread.h"
-#include "tcpsession.h"
+#include "receive_tcpthread.h"
+#include "receive_tcpsession.h"
 
 using namespace std;
 
@@ -37,22 +35,22 @@ public:
     //关闭, 非线程安全
     void Stop();
     //获取最小会话数线程
-    TcpThread *PickMinThread();
+    Receive_TcpThread *PickMinThread();
     //获取会话数
     vector<uint32_t> GetSessionSize()const;
     //添加会话
-    void AddSession(std::shared_ptr<TcpSession> &session);
+    void AddSession(std::shared_ptr<Receive_TcpSession> &session);
 
 private slots:
     //会话断开
     void SlotSessionDisConnected(void *id);
 
 private:
-    vector<TcpThread*> threadList_;
+    vector<Receive_TcpThread*> threadList_;
     //互斥量
     mutex lock_;
     //会话列表
-    unordered_map<void*, shared_ptr<TcpSession>> sessionList_;
+    unordered_map<void*, shared_ptr<Receive_TcpSession>> sessionList_;
 
     bool isRunning_ = false;
 };

@@ -9,18 +9,17 @@
   ---------------------------------------------------------
   * */
 #pragma execution_character_set("utf-8")
-#include "tcpserver.h"
+#include "receive_tcpserver.h"
 
-TcpServer::TcpServer(QObject *parent) : QTcpServer(parent)
+Receive_TcpServer::Receive_TcpServer(QObject *parent) : QTcpServer(parent)
 {
 
 }
 
-TcpServer::~TcpServer()
+Receive_TcpServer::~Receive_TcpServer()
 {
     this->Stop();
 }
-
 /**
   ---------------------------------------------------------
   * @file         File Name: tcpserver.cpp
@@ -33,9 +32,9 @@ TcpServer::~TcpServer()
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-void TcpServer::incomingConnection(qintptr socketDescriptor)
+void Receive_TcpServer::incomingConnection(qintptr socketDescriptor)
 {
-    shared_ptr<TcpSession> session = this->CreateSession(socketDescriptor);
+    shared_ptr<Receive_TcpSession> session = this->CreateSession(socketDescriptor);
     qDebug() << "TcpServer::incomingConnection socketDescriptor:"<< socketDescriptor ;
     if(this->OnAccepted) {
         this->OnAccepted(session);
@@ -54,7 +53,7 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-bool TcpServer::Start(ServerData &conf)
+bool Receive_TcpServer::Start(ServerData &conf)
 {
     if(isRunning_) {
         return true;
@@ -83,7 +82,7 @@ bool TcpServer::Start(ServerData &conf)
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-void TcpServer::Stop()
+void Receive_TcpServer::Stop()
 {
     if(!isRunning_) {
         return ;
@@ -95,7 +94,7 @@ void TcpServer::Stop()
     isRunning_ = false;
 }
 
-bool TcpServer::IsStart()
+bool Receive_TcpServer::IsStart()
 {
     return isRunning_;
 }
@@ -112,16 +111,16 @@ bool TcpServer::IsStart()
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-vector<uint32_t> TcpServer::GetSessionSize() const
+vector<uint32_t> Receive_TcpServer::GetSessionSize() const
 {
     return this->sessionThreads_.GetSessionSize();
 }
 
 
-shared_ptr<TcpSession> TcpServer::CreateSession(qintptr handle)
+shared_ptr<Receive_TcpSession> Receive_TcpServer::CreateSession(qintptr handle)
 {
-    TcpThread *thread = this->sessionThreads_.PickMinThread();
-    shared_ptr<TcpSession> session = make_shared<TcpSession>(thread);
+    Receive_TcpThread *thread = this->sessionThreads_.PickMinThread();
+    shared_ptr<Receive_TcpSession> session = make_shared<Receive_TcpSession>(thread);
     session->setSocketDescriptor(handle);
     this->sessionThreads_.AddSession(session);
     session->moveToThread(thread);
