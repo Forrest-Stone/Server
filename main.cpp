@@ -18,11 +18,13 @@
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QTextCodec>
-
+#include <unordered_map>
 #include "receive_tcpserver.h"
-
+#include "user_detail.h"
+using namespace std;
 using namespace cv;
 
+unordered_map<unsigned int,User_Detail> user_map;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
