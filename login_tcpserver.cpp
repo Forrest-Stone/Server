@@ -36,9 +36,6 @@ MyThread *Login_TcpServer::find_thread()
                 threads[i]=new MyThread(this,sockets[i],fun);
                 threads[i]->start();
             }
-            else if(sockets[i].size()==0) {
-                threads[i]->start();
-            }
             return threads[i];
         }
     }
