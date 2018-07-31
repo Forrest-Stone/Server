@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MainWindow w;
-    w.show();
 
     // 查看数据库中可用的驱动
     qDebug() << "可用的驱动：";
@@ -44,8 +43,8 @@ int main(int argc, char *argv[])
     db.setHostName("localhost");
     db.setDatabaseName("car");
     db.setPort(3306);
-    db.setUserName("zys");
-    db.setPassword("zyszuibang");
+    db.setUserName("root");
+    db.setPassword("363677052");
     bool ok = db.open();
     if (ok)
         qDebug() << "数据库连接成功";

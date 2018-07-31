@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QString>
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 #pragma execution_character_set("utf-8")
 static std::unordered_map<std::string,std::string>  server_user_password;
 
@@ -12,6 +14,7 @@ Server_Login_Dialog::Server_Login_Dialog(QWidget *parent) :QDialog(parent),ui(ne
 {
     ui->setupUi(this);
     myserver=NULL;
+    fun=new login_handler(this);
     server_user_password.insert(std::make_pair("zys","123"));
     server_user_password.insert(std::make_pair("zzl","123"));
     server_user_password.insert(std::make_pair("lw","123"));
@@ -54,6 +57,11 @@ void Server_Login_Dialog::on_pushButton_clicked()
     ui->lineEdit->clear();
     ui->lineEdit_2->clear();
     qDebug()<<"server login success  哈哈";
-    myserver=new Login_TcpServer(this,7777,100,fun);
+    myserver=new Login_TcpServer(this,7777,100,*fun);
     qDebug()<<"Now server is listening at port 7777 waiting for clients to login.";
+    MainWindow* parent=static_cast<MainWindow*>(this->parent());
+    parent->ui->plainTextEdit->appendPlainText(QString("server login success."));
+    parent->ui->plainTextEdit->appendPlainText(QString("Now server is listening at port 7777 waiting for clients to login."));
+    this->close();
+    parent->show();
 }

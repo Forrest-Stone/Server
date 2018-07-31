@@ -16,7 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
+    login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer();
+    login->show();
 }
 
 MainWindow::~MainWindow()
