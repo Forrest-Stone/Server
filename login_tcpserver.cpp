@@ -2,7 +2,14 @@
 #pragma execution_character_set("utf-8")
 Login_TcpServer::~Login_TcpServer()
 {
-
+    for(int i=0;i<max_thread;i++)
+    {
+        if(threads[i]!=NULL)
+        {
+            threads[i]->quit();
+            threads[i]->wait();
+        }
+    }
 }
 Login_TcpServer::Login_TcpServer(QObject *parent,int port,int thread_num,handler&fun):QTcpServer(parent),port(port),fun(fun),threads(thread_num,NULL)
 {

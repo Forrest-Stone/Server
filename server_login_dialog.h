@@ -7,7 +7,7 @@
 namespace Ui {
 class Server_Login_Dialog;
 }
-
+class login_handler;
 class Server_Login_Dialog : public QDialog
 {
     Q_OBJECT
@@ -21,7 +21,7 @@ private slots:
 
 private:
     Ui::Server_Login_Dialog *ui;
-    login_handler fun;
+    login_handler * fun;
     Login_TcpServer*myserver;
 };
 

@@ -38,6 +38,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
+    Server_Login_Dialog*login  = nullptr;
     void Write(const QString &msg);
 };
 
