@@ -14,6 +14,8 @@
 #include <QMainWindow>
 
 #include "receive_tcpserver.h"
+#include "server_login_dialog.h"
+#include "login_handler.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +28,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    friend class Server_Login_Dialog;
+    friend class login_handler;
 
 private slots:
     void on_pushButton_clicked();

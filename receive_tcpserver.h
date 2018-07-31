@@ -41,7 +41,6 @@ class Receive_TcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
-//    Receive_TcpServer() = default;
     explicit Receive_TcpServer(QObject *parent = nullptr);
     ~Receive_TcpServer();
 

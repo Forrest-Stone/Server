@@ -35,7 +35,7 @@ Receive_TcpServer::~Receive_TcpServer()
 void Receive_TcpServer::incomingConnection(qintptr socketDescriptor)
 {
     shared_ptr<Receive_TcpSession> session = this->CreateSession(socketDescriptor);
-    qDebug() << "TcpServer::incomingConnection socketDescriptor:"<< socketDescriptor ;
+    qDebug() << "Receive_TcpServer::incomingConnection socketDescriptor:"<< socketDescriptor ;
     if(this->OnAccepted) {
         this->OnAccepted(session);
     }
