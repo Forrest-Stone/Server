@@ -11,10 +11,81 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>服务器主窗口</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">font: 9pt &quot;Microsoft YaHei UI&quot;;</string>
+   <string notr="true">font: 9pt &quot;Microsoft YaHei UI&quot;;
+/* 全局样式文件表 */
+QWidget, QMainWindow, QLabel, QDialog, QTableView {
+    font: 9pt &quot;Microsoft YaHei UI&quot;;
+}
+
+/* === QPushButton === */
+QLineEdit, QPushButton {
+    border: 1px solid #333333;
+    padding: 3px;
+    min-width: 65px;
+    min-height: 12px;
+}
+
+QPushButton:hover {
+    background-color: lightslategrey;
+    border-color: #444444;
+}
+
+QPushButton:pressed {
+    background-color: #444444;
+    border-color: #333333;
+    color: antiquewhite;
+}
+
+QPushButton:disabled {
+    color: #333333;
+}
+
+/* 表格 */
+QTableView, QTableWidget {
+    border: 1px solid gray;
+    background: white;
+    gridline-color: gray;
+}
+
+QTableView::item, QTableWidget::item {
+    padding-left: 5px;
+    padding-right: 5px;
+    border: none;
+    background: lightgrey;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+}
+
+QTableView::item:selected, QTableWidget::item:selected {
+    background: aquamarine;
+    color: #444444;
+}
+
+QTableView::item:selected:! active, QTableWidget::item:selected:! active {
+    color: black;
+}
+
+QTableView::indicator, QTableWidget::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QHeaderView::section {
+    background: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 0,
+    y2: 1,
+    stop: 0 rgba(160, 160, 160, 255),
+    stop: 1 rgba(140, 140, 140, 255));
+    color: #333333;
+    border: 1px solid gray;
+}
+
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_4">
@@ -27,25 +98,25 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-      <item row="0" column="2">
+      <item row="0" column="3">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>服务器端口号：</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3" colspan="2">
-       <widget class="QLineEdit" name="lineEdit_2"/>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="lineEdit"/>
       </item>
-      <item row="0" column="5">
+      <item row="0" column="6">
        <widget class="QPushButton" name="pushButton">
         <property name="text">
          <string>开启监听</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="4" colspan="2">
+       <widget class="QLineEdit" name="lineEdit_2"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_3">
@@ -54,17 +125,28 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_3"/>
-      </item>
-      <item row="1" column="2">
+      <item row="1" column="3">
        <widget class="QPushButton" name="pushButton_2">
         <property name="text">
          <string>文件保存路径</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="1" column="5">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>当前客户数：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -77,26 +159,15 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>当前连接数：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="lineEdit_3"/>
       </item>
      </layout>
     </item>
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -176,6 +247,57 @@
             <string>是否识别</string>
            </property>
           </column>
+          <column>
+           <property name="text">
+            <string>是否校验</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>12.212.323.124</string>
+           </property>
+           <property name="text">
+            <string>20180806ISMMSJAX</string>
+           </property>
+           <property name="text">
+            <string>129KB</string>
+           </property>
+           <property name="text">
+            <string>100%</string>
+           </property>
+           <property name="text">
+            <string>C:/User/Download</string>
+           </property>
+           <property name="text">
+            <string>否</string>
+           </property>
+           <property name="text">
+            <string>否</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>142.123.121.12</string>
+           </property>
+           <property name="text">
+            <string>20180805SASXGKSAKAD</string>
+           </property>
+           <property name="text">
+            <string>123KB</string>
+           </property>
+           <property name="text">
+            <string>100%</string>
+           </property>
+           <property name="text">
+            <string>C:/User/Download</string>
+           </property>
+           <property name="text">
+            <string>否</string>
+           </property>
+           <property name="text">
+            <string>否</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>

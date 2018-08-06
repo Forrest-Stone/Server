@@ -12,10 +12,25 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QHostAddress>
+#include <QNetworkInterface>
+#include <QHostInfo>
+#include <QStandardPaths>
+#include <QFileDialog>
+#include <QDir>
+#include <QDateTime>
 
 #include "receive_tcpserver.h"
 #include "server_login_dialog.h"
 #include "login_handler.h"
+#include "sessioninfo.h"
+#include "sessioninfolist.h"
+
+#define STARTSERVER "开启监听"
+#define STOPSERVER "关闭监听"
+#define PORTNUM 8888
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -27,16 +42,29 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
     friend class Server_Login_Dialog;
     friend class login_handler;
+
+    QString GetCurrentTime();
+    QString GetFileSavePath();
+    void AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession);
 private slots:
     void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+    void SlotDisConnected();
+    void SlotRead(SessionInfo *info, qint64 size);
+    void SlotReadClient(SessionInfo *info, QString);
 
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
-    Server_Login_Dialog*login  = nullptr;
+    Server_Login_Dialog *login  = nullptr;
+    SessionInfoList sessionList_;
     void Write(const QString &msg);
+    QString GetHostIpAddr();
 };
 
 #endif // MAINWINDOW_H
