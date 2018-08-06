@@ -32,9 +32,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MainWindow w;
-    ShowPicture ss;
-    ss.show();
-
     // 查看数据库中可用的驱动
     qDebug() << "可用的驱动：";
     QStringList drivers = QSqlDatabase::drivers();

@@ -7,6 +7,7 @@ MyThread::MyThread(QObject *parent,set<QTcpSocket*>&sockets,handler&fun) : QThre
 void MyThread::add_socket(QTcpSocket*socket)
 {
     sockets.insert(socket);
+    socket->moveToThread(this);
     //connect(socket,SIGNAL(connected()),this,SLOT(showConnected()),Qt::QueuedConnection);
     connect(socket,SIGNAL(disconnected()),this,SLOT(remove_set()),Qt::QueuedConnection);
     connect(socket,SIGNAL(readyRead()),this,SLOT(readMessage()),Qt::QueuedConnection);

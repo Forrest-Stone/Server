@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
+    sp = new ShowPicture(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
     login->show();
 }

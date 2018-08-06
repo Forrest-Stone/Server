@@ -15,36 +15,18 @@ static unordered_map<unsigned int,int> ip_row_map;
 login_handler::login_handler(QObject*parent):QObject(parent)
 {
 }
-void login_handler::operator ()(QTcpSocket* a)
+
+//这个函数负责用户登录
+void login_handler::user_login(unsigned int ip_addr,QByteArray&array,string&str_array,QTcpSocket*a)
 {
-    QByteArray array;
+    lock_guard<mutex> lockg(this->lock);
     User_Detail user_detail;
-    cnt++;
-    unsigned int ip_addr=a->peerAddress().toIPv4Address();
-    array=a->readAll();
-    QString temp_array=array;
-    string str_array(temp_array.toStdString().c_str());
-    if(str_array.size()!=0&&str_array[0]=='!'&&str_array.size()==1)//字符串首字符为！，且长度为1，就表明客户登出
-    {
-        if(user_map.find(ip_addr)!=user_map.end())
-        {
-            qDebug()<<"user "<<user_map[ip_addr].user_id<<" logout!";
-            MainWindow*gp=static_cast<MainWindow*>(this->parent()->parent());
-            gp->ui->plainTextEdit->appendPlainText(QString("user %1 loged out!").arg(user_map[ip_addr].user_id));
-            int rowNum=ip_row_map[ip_addr];
-            gp->ui->tableWidget->removeRow(rowNum);
-            user_map.erase(ip_addr);
-            ip_row_map.erase(ip_addr);
-        }
-        qDebug()<<"接收了"<<QString::number(cnt)<<" 次。";
-        return;
-    }
-    temp_data[ip_addr]+=str_array;//下面的内容表明客户登录
+    temp_data[ip_addr]+=str_array;
     string&s=temp_data[ip_addr];
     int size=s.size();
     string user_name;
     string user_pwd;
-    if(temp_data[ip_addr][size-1]=='$')
+    if(temp_data[ip_addr][size-1]=='$')//这部分分割出用户名和密码
     {
         int i=0;
         for(;i<size;i++)
@@ -54,11 +36,8 @@ void login_handler::operator ()(QTcpSocket* a)
                 break;
             }
         }
-        qDebug()<<array;
-        qDebug()<<array.toHex().toUpper();
         user_name=s.substr(0,i);
         user_pwd=s.substr(i+1,size-i-2);
-        user_pwd.push_back(0);
         QByteArray bytes;
         for(i++;i<array.size()-1;i++)
         {
@@ -67,7 +46,7 @@ void login_handler::operator ()(QTcpSocket* a)
         qDebug()<<bytes;
         qDebug()<<bytes.toHex().toUpper();
         int res=sql_judge(user_name,bytes.toHex().toUpper().toStdString(),user_detail);
-        if(res==0)
+        if(res==0)//登录成功的相应操作
         {
             user_map[ip_addr]=user_detail;
             MainWindow*gp=static_cast<MainWindow*>(this->parent()->parent());
@@ -83,6 +62,48 @@ void login_handler::operator ()(QTcpSocket* a)
         temp_data.erase(ip_addr);
         QByteArray send_array(QString::number(res).toStdString().c_str());
         a->write(send_array);
+    }
+}
+
+//这个函数负责用户登出
+void login_handler::user_logout(unsigned int ip_addr)
+{
+    lock_guard<mutex> lockg(this->lock);
+    if(user_map.find(ip_addr)!=user_map.end())
+    {
+        qDebug()<<"user "<<user_map[ip_addr].user_id<<" logout!";
+        MainWindow*gp=static_cast<MainWindow*>(this->parent()->parent());
+        gp->ui->plainTextEdit->appendPlainText(QString("user %1 loged out!").arg(user_map[ip_addr].user_id));
+        int rowNum=ip_row_map[ip_addr];
+        gp->ui->tableWidget->removeRow(rowNum);
+        user_map.erase(ip_addr);
+        ip_row_map.erase(ip_addr);
+    }
+}
+
+void login_handler::operator ()(QTcpSocket* a)
+{
+    QByteArray array;
+    cnt++;
+    unsigned int ip_addr=a->peerAddress().toIPv4Address();
+    array=a->readAll();
+    QString temp_array=array;
+    string str_array(temp_array.toStdString().c_str());
+    if(str_array.size()!=0&&str_array[0]=='!'&&str_array.size()==1)//字符串首字符为！，且长度为1，就表明客户登出
+    {
+        user_logout(ip_addr);
+        qDebug()<<"接收了"<<QString::number(cnt)<<" 次。";
+        return;
+    }
+    else//这里表明用户登录
+    {
+       user_login(ip_addr,array,str_array,a);
+       string&s=temp_data[ip_addr];
+       if(s.size()>200)//如果收到大于200长度的字符串，就认为对方恶意登录，强行断开
+       {
+           temp_data.erase(ip_addr);
+           a->disconnectFromHost();
+       }
     }
     qDebug()<<"接收了"<<QString::number(cnt)<<" 次。";
 }

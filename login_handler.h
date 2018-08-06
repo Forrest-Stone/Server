@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <QObject>
+#include <mutex>
 #include "user_detail.h"
 #include "mainwindow.h"
 using namespace std;
@@ -19,6 +20,9 @@ public:
     unordered_map<unsigned int,string> temp_data;
 private:
     int sql_judge(string user_name,string pwd,User_Detail&user_detail);
+    mutex lock;
+    void user_login(unsigned int ip_addr, QByteArray&array,string &str_array,QTcpSocket*a);
+    void user_logout(unsigned int ip_addr);
 };
 
 #endif // login_handler_H

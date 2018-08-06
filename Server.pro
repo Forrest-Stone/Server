@@ -64,8 +64,6 @@ FORMS += \
     server_login_dialog.ui \
     showpicture.ui
 
-INCLUDEPATH += E:\Code\opencv\opencv\build\include
-LIBS += E:\Code\opencv\opencv\build\x64\vc15\lib\*.lib
 
 SUBDIRS += \
     Server.pro
@@ -75,3 +73,25 @@ DISTFILES += \
 
 RESOURCES += \
     pic.qrc
+
+
+INCLUDEPATH += F:\opencv-3.2\opencv\build\include
+INCLUDEPATH += F:\QT\EasyPR\include
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../opencv-3.2/opencv/build/x64/vc14/lib/ -lopencv_world320
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../opencv-3.2/opencv/build/x64/vc14/lib/ -lopencv_world320d
+
+INCLUDEPATH += $$PWD/../../opencv-3.2/opencv/build/x64/vc14
+DEPENDPATH += $$PWD/../../opencv-3.2/opencv/build/x64/vc14
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../EasyPR/x64/release/ -llibeasypr
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../EasyPR/x64/debug/ -llibeasypr
+
+INCLUDEPATH += $$PWD/../EasyPR/x64/Debug
+DEPENDPATH += $$PWD/../EasyPR/x64/Debug
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../EasyPR/x64/release/liblibeasypr.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../EasyPR/x64/debug/liblibeasypr.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../EasyPR/x64/release/libeasypr.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../EasyPR/x64/debug/libeasypr.lib
+
