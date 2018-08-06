@@ -37,24 +37,10 @@ SOURCES += \
     login_handler.cpp \
     login_mythread.cpp \
     login_tcpserver.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    receive_tcpserver.cpp \
-    receive_tcpsession.cpp \
-    receive_tcpthread.cpp \
     server_login_dialog.cpp \
-    sessionthreads.cpp \
-    handler.cpp \
-    login_handler.cpp \
-    login_mythread.cpp \
-    login_tcpserver.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    receive_tcpserver.cpp \
-    receive_tcpsession.cpp \
-    receive_tcpthread.cpp \
-    server_login_dialog.cpp \
-    sessionthreads.cpp
+    showpicture.cpp \
+    sessioninfo.cpp \
+    sessioninfolist.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -67,40 +53,25 @@ HEADERS += \
     login_handler.h \
     login_mythread.h \
     login_tcpserver.h \
-    mainwindow.h \
-    receive_tcpserver.h \
-    receive_tcpsession.h \
-    receive_tcpthread.h \
-    server_login_dialog.h \
-    sessionthreads.h \
     user_detail.h \
-    connection.h \
-    handler.h \
-    login_handler.h \
-    login_mythread.h \
-    login_tcpserver.h \
-    mainwindow.h \
-    receive_tcpserver.h \
-    receive_tcpsession.h \
-    receive_tcpthread.h \
     server_login_dialog.h \
-    sessionthreads.h \
-    user_detail.h
+    showpicture.h \
+    sessioninfo.h \
+    sessioninfolist.h
 
 FORMS += \
         mainwindow.ui \
-    mainwindow.ui \
     server_login_dialog.ui \
-    mainwindow.ui \
-    server_login_dialog.ui
+    showpicture.ui
 
 INCLUDEPATH += E:\Code\opencv\opencv\build\include
 LIBS += E:\Code\opencv\opencv\build\x64\vc15\lib\*.lib
 
 SUBDIRS += \
-    Server.pro \
     Server.pro
 
 DISTFILES += \
-    Server.pro.user \
     Server.pro.user
+
+RESOURCES += \
+    pic.qrc

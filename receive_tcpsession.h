@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QString>
 #include <QDataStream>
+#include <QCoreApplication>
 
 #include "receive_tcpthread.h"
 
@@ -42,19 +43,24 @@ public:
     std::function<void(const QByteArray&)> OnRead = nullptr;
 
     void processFileData(QByteArray &array);
+
 signals:
-    void SignalRead(const QByteArray &, int);
+    void SignalRead(qint64 size);
+//    void SignalRead(const QByteArray &array, int);
 //    void SignalReceiveData(qint64 size);
     void SignalDisConnected(void *);
     void SignalDoWrite();
     void SignalDoDisConnect();
     void SignalDoConnectToServer(const QString &, quint16);
 
+    // 接收客户端有关信息
+    void SignalClientIP(QString ip);
+
     // 接受文件有关信号
     void SignalReadFile(qint64 size);
     void SignalReadFileName(const QString name);
     void SignalReadFileSize(qint64 size);
-    void SignalMessage(QString msg);
+//    void SignalMessage(QString msg);
 
 private slots:
     // 连接 Server
@@ -75,6 +81,7 @@ private slots:
 //    void SlotReadFileSize(qint64 size);
 //    void SlotMessage(QString msg);
 
+    void SlotReadClientIP();
 private:
     Receive_TcpThread *thread_ = nullptr;
     QByteArray buffer_ = nullptr;

@@ -37,6 +37,7 @@ void Receive_TcpServer::incomingConnection(qintptr socketDescriptor)
     shared_ptr<Receive_TcpSession> session = this->CreateSession(socketDescriptor);
     qDebug() << "Receive_TcpServer::incomingConnection socketDescriptor:"<< socketDescriptor ;
     if(this->OnAccepted) {
+        qDebug() << "开始接受新的请求了！";
         this->OnAccepted(session);
     }
 }
@@ -58,16 +59,18 @@ bool Receive_TcpServer::Start(ServerData &conf)
     if(isRunning_) {
         return true;
     }
-    //验证数据
+    // 验证数据
     conf.Verify();
-    //启动线程池
+    qDebug() << conf.threadNum;
+    // 启动线程池
     sessionThreads_.Start(conf.threadNum);
-    //监听端口
+    // 监听端口
     if(!this->listen(QHostAddress::Any, (quint16)conf.portNum)) {
         return false;
     }
-    qDebug() << "监听成功！" << endl;
+    qDebug() << "监听成功！";
     isRunning_ = true;
+    qDebug() << "Receive_TcpServer::Start threadID:"<< QThread::currentThreadId();
     return true;
 }
 
@@ -119,11 +122,13 @@ vector<uint32_t> Receive_TcpServer::GetSessionSize() const
 
 shared_ptr<Receive_TcpSession> Receive_TcpServer::CreateSession(qintptr handle)
 {
+    qDebug() << "开始创建会话连接！";
     Receive_TcpThread *thread = this->sessionThreads_.PickMinThread();
     shared_ptr<Receive_TcpSession> session = make_shared<Receive_TcpSession>(thread);
     session->setSocketDescriptor(handle);
     this->sessionThreads_.AddSession(session);
     session->moveToThread(thread);
+    qDebug() << "移交线程池处理";
     if(thread)
         thread->AddOne();
     return session;

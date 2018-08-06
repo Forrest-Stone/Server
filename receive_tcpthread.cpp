@@ -2,7 +2,7 @@
 
 Receive_TcpThread::Receive_TcpThread()
 {
-
+    this->start();
 }
 
 Receive_TcpThread::~Receive_TcpThread()

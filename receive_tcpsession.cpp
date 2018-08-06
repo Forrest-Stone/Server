@@ -9,6 +9,7 @@
   ---------------------------------------------------------
   * */
 #include "receive_tcpsession.h"
+#include "mainwindow.h"
 
 /**
   ---------------------------------------------------------
@@ -26,8 +27,7 @@ Receive_TcpSession::Receive_TcpSession(Receive_TcpThread *parent)
     this->blockSize_ = 0;
     this->blockNumber_ = 0;
     this->thread_ = parent;
-    //    connect(this, &Receive_TcpSession::readyRead,
-    //            this, &Receive_TcpSession::SlotReadFile);
+    receiveFile_ = new QFile();
     connect(this, &Receive_TcpSession::readyRead,
             this, &Receive_TcpSession::SlotStartRead);
     connect(this, &Receive_TcpSession::disconnected,
@@ -38,21 +38,10 @@ Receive_TcpSession::Receive_TcpSession(Receive_TcpThread *parent)
             this, &Receive_TcpSession::SlotDoWrite);
     connect(this, &Receive_TcpSession::SignalDoConnectToServer,
             this, &Receive_TcpSession::SlotDoConnectToServer);
-    connect(this, &Receive_TcpSession::SignalMessage,
-            this, &Receive_TcpSession::SignalMessage);
+    connect(this, &Receive_TcpSession::SignalClientIP,
+            this, &Receive_TcpSession::SlotReadClientIP);
 }
 
-/**
-  ---------------------------------------------------------
-  * @file         File Name: Receive_TcpSession.cpp
-  * @function     Function Name: ~Receive_TcpSession
-  * @brief        Description: 析构函数，处理断开连接的会话
-  * @date         Date: 2018-07-27 14:52:46 周五
-  * @param        Parameter: Tags
-  * @return       Return Code: ReturnType
-  * @author       Author: 张岩森
-  ---------------------------------------------------------
-  * */
 Receive_TcpSession::~Receive_TcpSession()
 {
     disconnect(this, &Receive_TcpSession::readyRead,
@@ -65,8 +54,8 @@ Receive_TcpSession::~Receive_TcpSession()
                this, &Receive_TcpSession::SlotDoWrite);
     disconnect(this, &Receive_TcpSession::SignalDoConnectToServer,
                this, &Receive_TcpSession::SlotDoConnectToServer);
-    disconnect(this, &Receive_TcpSession::SignalMessage,
-               this, &Receive_TcpSession::SignalMessage);
+    disconnect(this, &Receive_TcpSession::SignalClientIP,
+               this, &Receive_TcpSession::SlotReadClientIP);
 }
 
 void Receive_TcpSession::ConnectToServer(const QString &host, quint16 port)
@@ -77,6 +66,7 @@ void Receive_TcpSession::ConnectToServer(const QString &host, quint16 port)
 // 断开连接
 void Receive_TcpSession::Disconnect()
 {
+    qDebug() << "Receive_TcpSession::Disconnect threadID:"<< QThread::currentThreadId();
     emit this->SignalDoDisConnect();
 }
 
@@ -93,26 +83,26 @@ void Receive_TcpSession::SlotDoConnectToServer(const QString &host, quint16 port
 
 void Receive_TcpSession::SlotStartRead()
 {
-    //    while(socket_->bytesAvailable() >= sizeof(quint64)) {
-    //        if(blockSize_ == 0) {
-    //            if(socket_->bytesAvailable() < sizeof(qint64)) {
-    //                return ;
-    //            }
-    //            socket_->read((char *)&blockSize_, sizeof(qint64));
-    //        }
-    //        if(socket_->bytesAvailable() < blockSize_) {
-    //            return;
-    //        }
-    //        emit this->SignalRead(blockSize + sizeof(qint64));
-    //        QByteArray data = s->read(blockSize);
-    //        proccessData(data);
-    //        blockSize = 0;
-    //    }
-    buffer_ = this->readAll();
-    if(OnRead)
-        OnRead(buffer_);
-    processFileData(buffer_);
-    emit this->SignalRead(buffer_.toStdString().c_str(), buffer_.length());
+    qDebug()<<"开始建立连接传输数据了";
+    qDebug() << "Receive_TcpSession::SlotStartRead threadID:"<< QThread::currentThreadId();
+    while(this->bytesAvailable() >= sizeof(quint64)) {
+        qDebug() << this->bytesAvailable();
+//        qDebug() << sizeof(quint64);
+        if(blockSize_ == 0) {
+            if(this->bytesAvailable() < sizeof(qint64)) {
+                return ;
+            }
+            this->read((char *)&blockSize_, sizeof(qint64));
+        }
+        if(this->bytesAvailable() < blockSize_) {
+            return ;
+        }
+        emit SignalRead(blockSize_ + sizeof(qint64));
+        QByteArray data = this->read(blockSize_);
+        processFileData(data);
+        blockSize_ = 0;
+        qDebug() << this->bytesAvailable();
+    }
 }
 
 void Receive_TcpSession::SlotDisConnected()
@@ -127,7 +117,15 @@ void Receive_TcpSession::SlotDisConnected()
 
 void Receive_TcpSession::SlotDoWrite()
 {
+
     this->write(writeBuffer_);
+}
+
+void Receive_TcpSession::SlotReadClientIP()
+{
+    qDebug() << "读取客户端IP的信号";
+    qDebug() << this->peerAddress().toString();
+    emit SignalClientIP(this->peerAddress().toString());
 }
 
 void Receive_TcpSession::SlotDoDisconnect()
@@ -145,25 +143,26 @@ void Receive_TcpSession::processFileData(QByteArray &array)
     in >> key >> data;
     blockNumber_ ++;
 
-    emit this->SignalMessage(QString("已接收数据包:%1个").arg( blockNumber_));
-    emit this->SignalMessage(QString("收到标识符:'%1' 当前数据包大小:'%2'字节").arg(key).arg(data.size()));
+    qDebug() << QString("已接收数据包:%1个").arg( blockNumber_);
+    qDebug() << QString("收到标识符:%1 当前数据包大小:%2字节").arg(key).arg(data.size());
 
     switch(key) {
     case 0x01:
-        receiveFileName_ = receiveFileName_.fromUtf8(data.data(), data.size());
-        receiveFile_->setFileName(receiveFileName_);
-//        receiveFile_.setFileName(qApp->applicationDirPath() + "/" + fileName);
+        receiveFileName_ = receiveFileName_.fromUtf8(data);
+        qDebug() << receiveFileName_;
+        receiveFile_->setFileName(QString(QCoreApplication::applicationDirPath()) + '/' + receiveFileName_);
         emit this->SignalReadFileName(receiveFile_->fileName());
         if(receiveFile_->exists()) {
             receiveFile_->remove();
         }
         if(!receiveFile_->open(QIODevice::WriteOnly)) {
-            emit this->SignalMessage("不能打开文件进行写入");
+            qDebug() << "不能进行文件写入！";
             break;
         }
         break;
     case 0x02: {
         QString size = QString::fromUtf8(data.data(), data.size());
+
         emit this->SignalReadFileSize(size.toUInt());
         break;
     }
@@ -173,7 +172,6 @@ void Receive_TcpSession::processFileData(QByteArray &array)
         break;
     case 0x04:
         receiveFile_->close();
-        socket_->disconnectFromHost();
         break;
     }
 }

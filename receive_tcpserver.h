@@ -15,8 +15,10 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <memory>
+#include <QHostAddress>
 
 #include "sessionthreads.h"
+#include "receive_tcpsession.h"
 
 #define PORTNUM 8888
 
@@ -30,7 +32,7 @@ struct ServerData
         if(0 == portNum) {
             portNum = PORTNUM;
         }
-        if(threadNum) {
+        if(!threadNum) {
             // 硬件线程上下文数量
             threadNum = thread::hardware_concurrency();
         }
@@ -54,7 +56,7 @@ public:
     vector<uint32_t> GetSessionSize() const;
 
 public:
-    //新连接回调
+    // 新连接回调 通知上层 并把新连接丢给上层
     function<void(shared_ptr<Receive_TcpSession> &)> OnAccepted = nullptr;
 
 protected:

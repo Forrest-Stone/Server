@@ -47,9 +47,9 @@ private slots:
 
 private:
     vector<Receive_TcpThread*> threadList_;
-    //互斥量
+    // 互斥量
     mutex lock_;
-    //会话列表
+    // 会话列表
     unordered_map<void*, shared_ptr<Receive_TcpSession>> sessionList_;
 
     bool isRunning_ = false;

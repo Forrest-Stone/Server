@@ -26,6 +26,7 @@ bool SessionThreads::Start(uint32_t threadNum)
     if(isRunning_) {
         return true;
     }
+    qDebug() << "初始化线程池！";
     for(uint32_t i = 0; i < threadNum; ++i) {
         Receive_TcpThread *thread = new Receive_TcpThread();
         threadList_.push_back(thread);
@@ -153,5 +154,7 @@ void SessionThreads::SlotSessionDisConnected(void *id)
     if(itor != sessionList_.end())
     {
         sessionList_.erase(itor);
+        qDebug()<< "SessionThreads::SlotSessionDisConnected" << QThread::currentThread();
     }
 }
+

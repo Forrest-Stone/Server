@@ -16,27 +16,75 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->lineEdit->setPlaceholderText(GetHostIpAddr());
+    ui->lineEdit_2->setPlaceholderText(QString::number(PORTNUM));
+    ui->lineEdit_3->setPlaceholderText(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
     ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
     login= new Server_Login_Dialog(this);
-    server_ = new Receive_TcpServer();
+    server_ = new Receive_TcpServer(this);
+    server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
     login->show();
 }
 
 MainWindow::~MainWindow()
 {
+    if(server_) {
+        server_->Stop();
+        delete server_;
+    }
+    server_ = nullptr;
     delete ui;
 }
 
+
+/**
+  ---------------------------------------------------------
+  * @file         File Name: mainwindows.cpp
+  * @function     Function Name: on_pushButton_clicjed()
+  * @brief        Description: 开启服务器监听
+  * @date         Date: 2018-08-02 09:40:30 周四
+  * @param        Parameter: Tags
+  * @return       Return Code: ReturnType
+  * @author       Author: 张岩森
+  ---------------------------------------------------------
+  * */
 void MainWindow::on_pushButton_clicked()
 {
-    uint16_t port = ui->lineEdit_2->text().toInt();
-    ServerData serverData;
-    serverData.portNum = port;
-    if(server_->Start(serverData)) {
-        this->Write("Start Successful!");
-    } else {
-        this->Write("Could Not Start Server!");
+    if(STARTSERVER == this->ui->pushButton->text()) {
+        uint16_t port = ui->lineEdit_2->text().toInt();
+        ServerData serverData;
+        serverData.portNum = port;
+        if(server_->Start(serverData)) {
+            QString startMessage = QString("接收文件监听开启！");
+            startMessage += QString(" 服务器IP：" + GetHostIpAddr());
+            startMessage += QString(" 监听端口：" + QString::number(serverData.portNum));
+            startMessage += QString(" " + GetCurrentTime());
+            this->Write(startMessage);
+        } else {
+            QString errorMessage = QString("启动文件监听服务失败！");
+            errorMessage += QString(" " + GetCurrentTime());
+            this->Write(errorMessage);
+        }
+        this->ui->pushButton->setText(STOPSERVER);
+    } else if(STOPSERVER == this->ui->pushButton->text()) {
+        this->ui->pushButton->setText(STARTSERVER);
+        QString closeMessage = QString("接收文件监听关闭！");
+        closeMessage += QString(" " + GetCurrentTime());
+        this->Write(closeMessage);
+        server_->Stop();
     }
+}
+
+void MainWindow::AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession)
+{
+    qDebug() << "主窗口关联接收的请求！";
+    SessionInfo *info = this->sessionList_.NewSessionInfo(tcpSession);
+    connect(info, &SessionInfo::SignalDisconnect, this, &MainWindow::SlotDisConnected);
+    connect(info, &SessionInfo::SignalRead, this, &MainWindow::SlotRead);
+    connect(info, &SessionInfo::SignalReadClient, this, &MainWindow::SlotReadClient);
+//    qDebug() << tcpSession.Receive_TcpSession::GetClientIP();
+
+    this->Write("Accept One");
 }
 
 void MainWindow::Write(const QString &msg)
@@ -44,3 +92,93 @@ void MainWindow::Write(const QString &msg)
     this->ui->plainTextEdit->appendPlainText(msg);
 }
 
+/**
+  ---------------------------------------------------------
+  * @file         File Name: mainwindows.cpp
+  * @function     Function Name: GetHostIpAddr
+  * @brief        Description: 获取服务器 IP 地址
+  * @date         Date: 2018-08-01 21:05:57 周三
+  * @param        Parameter: Tags
+  * @return       Return Code: QString
+  * @author       Author: 张岩森
+  ---------------------------------------------------------
+  * */
+QString MainWindow::GetHostIpAddr()
+{
+    QString strIpAddress;
+    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    // 获取第一个本主机的IPv4地址
+    int nListSize = ipAddressesList.size();
+    for (int i = 0; i < nListSize; ++i)
+    {
+        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
+                ipAddressesList.at(i).toIPv4Address()) {
+            strIpAddress = ipAddressesList.at(i).toString();
+            break;
+        }
+    }
+    // 如果没有找到，则以本地IP地址为IP
+    if (strIpAddress.isEmpty())
+        strIpAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    return strIpAddress;
+
+}
+
+/**
+  ---------------------------------------------------------
+  * @file         File Name: mainwindow.cpp
+  * @function     Function Name: on_pushButton_2_clicked()
+  * @brief        Description: 选择文件保存路径
+  * @date         Date: 2018-08-02 09:55:44 周四
+  * @param        Parameter: Tags
+  * @return       Return Code: ReturnType
+  * @author       Author: 张岩森
+  ---------------------------------------------------------
+  * */
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString filePath = QFileDialog::getExistingDirectory(this, "选择文件保存路径",
+                                                         QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
+    this->ui->lineEdit_3->setText(filePath);
+
+}
+
+// 获取当前系统时间 输出结果到界面显示
+QString MainWindow::GetCurrentTime()
+{
+    QString currentTime = QString(" 时间：");
+    currentTime += QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss ddd");
+    return currentTime;
+}
+
+// 获取保存路径
+QString MainWindow::GetFileSavePath()
+{
+    QString path;
+    if(NULL == ui->lineEdit_3->text()) {
+        path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    } else {
+        path = ui->lineEdit_3->text();
+    }
+    return path;
+}
+
+
+void MainWindow::SlotDisConnected()
+{
+    this->Write("Disconnected");
+}
+
+void MainWindow::SlotRead(SessionInfo *info, qint64 size)
+{
+//    QString
+//    QString msg = data;
+//    this->Write(msg);
+//    info->Write(data.toStdString().c_str(), size);
+}
+
+void MainWindow::SlotReadClient(SessionInfo *info, QString client)
+{
+    QString ip = client;
+    this->Write(ip);
+}
