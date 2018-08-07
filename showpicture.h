@@ -26,6 +26,9 @@ private slots:
 
     void on_lineEdit_2_textChanged(const QString &arg1);
 
+signals:
+    int has_rec(int row_num);
+
 private:
     Ui::ShowPicture *ui;
     unordered_map<int,QString>  license;

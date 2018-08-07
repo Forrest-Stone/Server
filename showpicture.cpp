@@ -2,7 +2,12 @@
 #include "ui_showpicture.h"
 #include "opencv2/opencv.hpp"
 #include "easypr.h"
+#include "mainwindow.h"
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
 using namespace cv;
 using namespace easypr;
 #pragma execution_character_set("utf-8")
@@ -14,6 +19,7 @@ ShowPicture::ShowPicture(QWidget *parent) :
     ui->lineEdit->setFocusPolicy(Qt::NoFocus);
     ui->lineEdit_2->setMaxLength(7);
     ui->pushButton_3->setEnabled(false);
+    connect(this,SIGNAL(has_rec(int)),static_cast<MainWindow*>(this->parent()),SLOT(SlotChangeRecState(int)));
 //    ui->label->show();
 
 //    QPixmap pixmap(normalIcon);
@@ -34,8 +40,10 @@ void ShowPicture::recognize(QString& file_path, int row_num)
     int result = pr.plateRecognize(src,plateVec);
     CPlate plate = plateVec[0];
     QString res =  QString::fromLocal8Bit(plate.getPlateStr().substr(3,7).c_str());
+    qDebug()<<QString("结果： ")<<res;
     license.insert(make_pair(row_num,res));
     path.insert(make_pair(row_num,file_path));
+    emit has_rec(row_num);
 }
 
 ShowPicture::~ShowPicture()
@@ -46,6 +54,10 @@ ShowPicture::~ShowPicture()
 //等那个DBM搞完再写吧
 void ShowPicture::check_out()
 {
+    final_res[row_num] = ui->lineEdit_2->text();
+    QSqlQuery query;
+    query.exec(QString("insert into picture values(,%1,%2)").arg(final_res[row_num]).arg(path[row_num]));
+    qDebug()<<query.lastError();
 
 }
 
@@ -65,7 +77,7 @@ void ShowPicture::on_pushButton_2_clicked()
 
 void ShowPicture::on_pushButton_3_clicked()
 {
-
+     check_out();
 }
 
 void ShowPicture::on_lineEdit_2_textChanged(const QString &arg1)
