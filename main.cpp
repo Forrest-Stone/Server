@@ -27,6 +27,7 @@ using namespace std;
 using namespace cv;
 
 unordered_map<unsigned int,User_Detail> user_map;
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
     db.setDatabaseName("car");
     db.setPort(3306);
     db.setUserName("root");
-    db.setPassword("363677052");
+    db.setPassword("zyszuibang");
     bool ok = db.open();
     if (ok)
         qDebug() << "数据库连接成功";
@@ -53,7 +54,6 @@ int main(int argc, char *argv[])
         qDebug() << "数据库连接失败";
 
     }
-
 
 //    TcpServer server;
 //    server.Start(8675, 2);

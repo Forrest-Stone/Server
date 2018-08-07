@@ -142,7 +142,7 @@ QHeaderView::section {
       <item row="1" column="6">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>2</string>
+         <string>连接数</string>
         </property>
        </widget>
       </item>
@@ -221,52 +221,6 @@ QHeaderView::section {
             <string>是否校验</string>
            </property>
           </column>
-          <item>
-           <property name="text">
-            <string>12.212.323.124</string>
-           </property>
-           <property name="text">
-            <string>20180806ISMMSJAX</string>
-           </property>
-           <property name="text">
-            <string>129KB</string>
-           </property>
-           <property name="text">
-            <string>100%</string>
-           </property>
-           <property name="text">
-            <string>C:/User/Download</string>
-           </property>
-           <property name="text">
-            <string>否</string>
-           </property>
-           <property name="text">
-            <string>否</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>142.123.121.12</string>
-           </property>
-           <property name="text">
-            <string>20180805SASXGKSAKAD</string>
-           </property>
-           <property name="text">
-            <string>123KB</string>
-           </property>
-           <property name="text">
-            <string>100%</string>
-           </property>
-           <property name="text">
-            <string>C:/User/Download</string>
-           </property>
-           <property name="text">
-            <string>否</string>
-           </property>
-           <property name="text">
-            <string>否</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>

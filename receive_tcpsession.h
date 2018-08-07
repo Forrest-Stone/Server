@@ -30,7 +30,6 @@ public:
     explicit Receive_TcpSession(Receive_TcpThread *parent = nullptr);
     ~Receive_TcpSession();
 
-    void ConnectToServer(const QString &host, quint16 port);
     // 断开连接
     void Disconnect();
     void Write(const char *data, qint64 len);
@@ -46,8 +45,6 @@ public:
 
 signals:
     void SignalRead(qint64 size);
-//    void SignalRead(const QByteArray &array, int);
-//    void SignalReceiveData(qint64 size);
     void SignalDisConnected(void *);
     void SignalDoWrite();
     void SignalDoDisConnect();
@@ -60,35 +57,23 @@ signals:
     void SignalReadFile(qint64 size);
     void SignalReadFileName(const QString name);
     void SignalReadFileSize(qint64 size);
-//    void SignalMessage(QString msg);
+
 
 private slots:
-    // 连接 Server
-    void SlotDoConnectToServer(const QString &host, quint16 port);
     // 开始读数据
     void SlotStartRead();
     // 断开连接回调
     void SlotDisConnected();
-    // 写数据
-    void SlotDoWrite();
     // 断开连接
     void SlotDoDisconnect();
-//    void SlotMessage(QString msg);
 
-    // 接收文件有关信号
-//    void SlotReadFile(qint64 size);
-//    void SlotReadFileName(const QString name);
-//    void SlotReadFileSize(qint64 size);
-//    void SlotMessage(QString msg);
 
-    void SlotReadClientIP();
 private:
     Receive_TcpThread *thread_ = nullptr;
     QByteArray buffer_ = nullptr;
     QByteArray writeBuffer_ = nullptr;
 
     // 接收文件有关信息
-    QTcpSocket *socket_;
     QFile *receiveFile_;            // 待接收文件
     QString receiveFileName_;       // 待接收文件名
     qint64 receiveFileTotalBytes_;  // 待接收文件总大小

@@ -29,24 +29,10 @@ SessionInfo::~SessionInfo()
     this->session_ = nullptr;
 }
 
-void SessionInfo::Connect(const QString &host, quint16 port)
-{
-    if(this->session_) {
-        this->session_->ConnectToServer(host, port);
-    }
-}
-
 void SessionInfo::Disconnect()
 {
     if(this->session_) {
         this->session_->Disconnect();
-    }
-}
-
-void SessionInfo::Write(const char *buffer, int size)
-{
-    if(this->session_) {
-        this->session_->Write(buffer, size);
     }
 }
 

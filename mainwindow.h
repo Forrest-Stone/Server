@@ -50,6 +50,7 @@ public:
     QString GetCurrentTime();
     QString GetFileSavePath();
     void AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession);
+
 private slots:
     void on_pushButton_clicked();
 
@@ -59,6 +60,7 @@ private slots:
     void SlotRead(SessionInfo *info, qint64 size);
     void SlotReadClient(SessionInfo *info, QString);
 
+    void SlotReadConnect(QString info);
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
