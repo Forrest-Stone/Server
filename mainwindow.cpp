@@ -23,9 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
-//    connect(server_, &Receive_TcpServer::SignalReadConnect,
-//            this, &MainWindow::SlotReadConnect);
+    connect(server_, &Receive_TcpServer::SignalReadConnect,
+            this, &MainWindow::SlotReadConnect);
     login->show();
+    this->sendFileSavePath();
 }
 
 MainWindow::~MainWindow()
@@ -81,15 +82,18 @@ void MainWindow::AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession)
 {
     qDebug() << "主窗口关联接收的请求！";
     SessionInfo *info = this->sessionList_.NewSessionInfo(tcpSession);
-
     connect(info, &SessionInfo::SignalDisconnect,
             this, &MainWindow::SlotDisConnected);
     connect(info, &SessionInfo::SignalRead,
             this, &MainWindow::SlotRead);
     connect(info, &SessionInfo::SignalReadClient,
             this, &MainWindow::SlotReadClient);
-    emit info->SignalReadClient(info, tcpSession.get()->peerAddress().toString());
-//    this->Write(QString("服务器接收一个客户端的发送请求！" + GetCurrentTime()));
+    connect(info, &SessionInfo::SignalReadFileName,
+            this, &MainWindow::SlotReadFileName);
+    connect(info, &SessionInfo::SignalReadFilePath,
+            this, &MainWindow::SlotReadFilePath);
+    connect(info, &SessionInfo::SignalReadFileSize,
+            this, &MainWindow::SlotReadFileSize);
 }
 
 void MainWindow::Write(const QString &msg)
@@ -145,7 +149,7 @@ void MainWindow::on_pushButton_2_clicked()
     QString filePath = QFileDialog::getExistingDirectory(this, "选择文件保存路径",
                                                          QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
     this->ui->lineEdit_3->setText(filePath);
-
+    this->sendFileSavePath();
 }
 
 // 获取当前系统时间 输出结果到界面显示
@@ -168,18 +172,30 @@ QString MainWindow::GetFileSavePath()
     return path;
 }
 
+void MainWindow::sendFileSavePath()
+{
+    savePath = this->GetFileSavePath();
+}
 
 void MainWindow::SlotDisConnected()
 {
     this->Write("Disconnected");
 }
 
-void MainWindow::SlotRead(SessionInfo *info, qint64 size)
+void MainWindow::SlotRead(qint64 size)
 {
     //    QString
     //    QString msg = data;
     //    this->Write(msg);
     //    info->Write(data.toStdString().c_str(), size);
+}
+
+void MainWindow::SlotReadConnect(QString info)
+{
+    QString clietInfo = QString("服务器接收客户端：" + info);
+    clietInfo += QString(" 的发送文件请求！");
+    clietInfo += GetCurrentTime();
+    this->Write(clietInfo);
 }
 
 /**
@@ -193,18 +209,31 @@ void MainWindow::SlotRead(SessionInfo *info, qint64 size)
   * @author       Author: 张岩森
   ---------------------------------------------------------
   * */
-void MainWindow::SlotReadClient(SessionInfo *info, QString client)
+void MainWindow::SlotReadClient(QString client)
 {
+    int rowNum = ui->tableWidget_2->rowCount();
+    ui->tableWidget_2->insertRow(rowNum);
+    ui->tableWidget_2->setItem(rowNum, 0, new QTableWidgetItem(client));
     QString clietInfo = QString("客户端IP：" + client);
     clietInfo += QString(" 向服务器发送文件 ");
     clietInfo += GetCurrentTime();
     this->Write(clietInfo);
 }
 
-void MainWindow::SlotReadConnect(QString info)
+void MainWindow::SlotReadFileName(QString fileName)
 {
-    QString clietInfo = QString("服务器接收客户端：" + info);
-    clietInfo += QString(" 的发送文件请求！");
-    clietInfo += GetCurrentTime();
-    this->Write(clietInfo);
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 1, new QTableWidgetItem(fileName));
+}
+
+void MainWindow::SlotReadFilePath(QString path)
+{
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 4, new QTableWidgetItem(path));
+}
+
+void MainWindow::SlotReadFileSize(qint64 size)
+{
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 2, new QTableWidgetItem(QString::number(size)));
 }
