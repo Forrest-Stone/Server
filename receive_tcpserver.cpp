@@ -35,10 +35,19 @@ Receive_TcpServer::~Receive_TcpServer()
 void Receive_TcpServer::incomingConnection(qintptr socketDescriptor)
 {
     shared_ptr<Receive_TcpSession> session = this->CreateSession(socketDescriptor);
-    qDebug() << "Receive_TcpServer::incomingConnection socketDescriptor:"<< socketDescriptor ;
-    if(this->OnAccepted) {
-        qDebug() << "开始接受新的请求了！";
-        this->OnAccepted(session);
+    // 判断用户是否登录，增强系统的安全性
+    // 非登录客户端无法发送图片，防止恶意破坏
+    extern unordered_map<unsigned int,User_Detail> user_map;
+    if(user_map.find(session.get()->peerAddress().toIPv4Address()) != user_map.end()) {
+        qDebug() << "Receive_TcpServer::incomingConnection socketDescriptor:"<< socketDescriptor ;
+        if(this->OnAccepted) {
+            qDebug() << "开始接受新的请求了！";
+            emit this->SignalReadConnect(session.get()->peerAddress().toString());
+            this->OnAccepted(session);
+        }
+    } else {
+        qDebug() << "用户未登录，无法发送图片！";
+        session.get()->Disconnect();
     }
 }
 
@@ -128,8 +137,14 @@ shared_ptr<Receive_TcpSession> Receive_TcpServer::CreateSession(qintptr handle)
     session->setSocketDescriptor(handle);
     this->sessionThreads_.AddSession(session);
     session->moveToThread(thread);
-    qDebug() << "移交线程池处理";
+    // 移交线程池处理
     if(thread)
         thread->AddOne();
     return session;
+
+}
+
+void Receive_TcpServer::SlotReadConnect(QString clientInfo)
+{
+    emit this->SignalReadConnect(clientInfo);
 }

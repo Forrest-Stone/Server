@@ -14,12 +14,8 @@ public:
     SessionInfo(std::shared_ptr<Receive_TcpSession> &session);
     ~SessionInfo();
 
-    //连接到服务端
-    void Connect(const QString &host, quint16 port);
     //断开连接
     void Disconnect();
-    //发送数据默认加密
-    void Write(const char*buffer, int size);
 
 signals:
     void SignalRead(SessionInfo*, qint64 size);

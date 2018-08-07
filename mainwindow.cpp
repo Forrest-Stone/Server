@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
+//    connect(server_, &Receive_TcpServer::SignalReadConnect,
+//            this, &MainWindow::SlotReadConnect);
     login->show();
 }
 
@@ -79,12 +81,15 @@ void MainWindow::AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession)
 {
     qDebug() << "主窗口关联接收的请求！";
     SessionInfo *info = this->sessionList_.NewSessionInfo(tcpSession);
-    connect(info, &SessionInfo::SignalDisconnect, this, &MainWindow::SlotDisConnected);
-    connect(info, &SessionInfo::SignalRead, this, &MainWindow::SlotRead);
-    connect(info, &SessionInfo::SignalReadClient, this, &MainWindow::SlotReadClient);
-//    qDebug() << tcpSession.Receive_TcpSession::GetClientIP();
 
-    this->Write("Accept One");
+    connect(info, &SessionInfo::SignalDisconnect,
+            this, &MainWindow::SlotDisConnected);
+    connect(info, &SessionInfo::SignalRead,
+            this, &MainWindow::SlotRead);
+    connect(info, &SessionInfo::SignalReadClient,
+            this, &MainWindow::SlotReadClient);
+    emit info->SignalReadClient(info, tcpSession.get()->peerAddress().toString());
+//    this->Write(QString("服务器接收一个客户端的发送请求！" + GetCurrentTime()));
 }
 
 void MainWindow::Write(const QString &msg)
@@ -171,14 +176,35 @@ void MainWindow::SlotDisConnected()
 
 void MainWindow::SlotRead(SessionInfo *info, qint64 size)
 {
-//    QString
-//    QString msg = data;
-//    this->Write(msg);
-//    info->Write(data.toStdString().c_str(), size);
+    //    QString
+    //    QString msg = data;
+    //    this->Write(msg);
+    //    info->Write(data.toStdString().c_str(), size);
 }
 
+/**
+  ---------------------------------------------------------
+  * @file         File Name: mainwindows.cpp
+  * @function     Function Name: SlotReadClient
+  * @brief        Description: 在主界面显示客户端连接状态
+  * @date         Date: 2018-08-06 14:26:54 周一
+  * @param        Parameter: Sesssion *info QString client
+  * @return       Return Code: ReturnType
+  * @author       Author: 张岩森
+  ---------------------------------------------------------
+  * */
 void MainWindow::SlotReadClient(SessionInfo *info, QString client)
 {
-    QString ip = client;
-    this->Write(ip);
+    QString clietInfo = QString("客户端IP：" + client);
+    clietInfo += QString(" 向服务器发送文件 ");
+    clietInfo += GetCurrentTime();
+    this->Write(clietInfo);
+}
+
+void MainWindow::SlotReadConnect(QString info)
+{
+    QString clietInfo = QString("服务器接收客户端：" + info);
+    clietInfo += QString(" 的发送文件请求！");
+    clietInfo += GetCurrentTime();
+    this->Write(clietInfo);
 }

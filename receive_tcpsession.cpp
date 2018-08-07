@@ -34,12 +34,6 @@ Receive_TcpSession::Receive_TcpSession(Receive_TcpThread *parent)
             this, &Receive_TcpSession::SlotDisConnected);
     connect(this, &Receive_TcpSession::SignalDoDisConnect,
             this, &Receive_TcpSession::SlotDoDisconnect);
-    connect(this, &Receive_TcpSession::SignalDoWrite,
-            this, &Receive_TcpSession::SlotDoWrite);
-    connect(this, &Receive_TcpSession::SignalDoConnectToServer,
-            this, &Receive_TcpSession::SlotDoConnectToServer);
-    connect(this, &Receive_TcpSession::SignalClientIP,
-            this, &Receive_TcpSession::SlotReadClientIP);
 }
 
 Receive_TcpSession::~Receive_TcpSession()
@@ -50,18 +44,8 @@ Receive_TcpSession::~Receive_TcpSession()
                this, &Receive_TcpSession::SlotDisConnected);
     disconnect(this, &Receive_TcpSession::SignalDoDisConnect,
                this, &Receive_TcpSession::SlotDoDisconnect);
-    disconnect(this, &Receive_TcpSession::SignalDoWrite,
-               this, &Receive_TcpSession::SlotDoWrite);
-    disconnect(this, &Receive_TcpSession::SignalDoConnectToServer,
-               this, &Receive_TcpSession::SlotDoConnectToServer);
-    disconnect(this, &Receive_TcpSession::SignalClientIP,
-               this, &Receive_TcpSession::SlotReadClientIP);
 }
 
-void Receive_TcpSession::ConnectToServer(const QString &host, quint16 port)
-{
-    emit this->SignalDoConnectToServer(host, port);
-}
 
 // 断开连接
 void Receive_TcpSession::Disconnect()
@@ -70,16 +54,6 @@ void Receive_TcpSession::Disconnect()
     emit this->SignalDoDisConnect();
 }
 
-void Receive_TcpSession::Write(const char *data, qint64 len)
-{
-    writeBuffer_ = QByteArray(data, len);
-    emit this->SignalDoWrite();
-}
-
-void Receive_TcpSession::SlotDoConnectToServer(const QString &host, quint16 port)
-{
-    this->connectToHost(QHostAddress(host), port);
-}
 
 void Receive_TcpSession::SlotStartRead()
 {
@@ -87,7 +61,6 @@ void Receive_TcpSession::SlotStartRead()
     qDebug() << "Receive_TcpSession::SlotStartRead threadID:"<< QThread::currentThreadId();
     while(this->bytesAvailable() >= sizeof(quint64)) {
         qDebug() << this->bytesAvailable();
-//        qDebug() << sizeof(quint64);
         if(blockSize_ == 0) {
             if(this->bytesAvailable() < sizeof(qint64)) {
                 return ;
@@ -115,19 +88,6 @@ void Receive_TcpSession::SlotDisConnected()
     emit this->SignalDisConnected(this);
 }
 
-void Receive_TcpSession::SlotDoWrite()
-{
-
-    this->write(writeBuffer_);
-}
-
-void Receive_TcpSession::SlotReadClientIP()
-{
-    qDebug() << "读取客户端IP的信号";
-    qDebug() << this->peerAddress().toString();
-    emit SignalClientIP(this->peerAddress().toString());
-}
-
 void Receive_TcpSession::SlotDoDisconnect()
 {
     this->disconnectFromHost();
@@ -152,6 +112,7 @@ void Receive_TcpSession::processFileData(QByteArray &array)
         qDebug() << receiveFileName_;
         receiveFile_->setFileName(QString(QCoreApplication::applicationDirPath()) + '/' + receiveFileName_);
         emit this->SignalReadFileName(receiveFile_->fileName());
+        emit this->SignalClientIP(this->peerAddress().toString());
         if(receiveFile_->exists()) {
             receiveFile_->remove();
         }
@@ -162,7 +123,6 @@ void Receive_TcpSession::processFileData(QByteArray &array)
         break;
     case 0x02: {
         QString size = QString::fromUtf8(data.data(), data.size());
-
         emit this->SignalReadFileSize(size.toUInt());
         break;
     }

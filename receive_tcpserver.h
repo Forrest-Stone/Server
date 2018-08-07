@@ -19,6 +19,7 @@
 
 #include "sessionthreads.h"
 #include "receive_tcpsession.h"
+#include "user_detail.h"
 
 #define PORTNUM 8888
 
@@ -64,6 +65,13 @@ protected:
     virtual void incomingConnection(qintptr socketDescriptor);
     // 创建会话
     shared_ptr<Receive_TcpSession> CreateSession(qintptr handle);
+
+protected slots:
+    // 读取连接信息
+    void SlotReadConnect(QString clientInfo);
+
+signals:
+    void SignalReadConnect(QString clientInfo);
 
 private:
     bool isRunning_ = false;
