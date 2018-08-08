@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
-    sp = new ShowPicture(this);
+    //sp = new ShowPicture(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
     connect(server_, &Receive_TcpServer::SignalReadConnect,
             this, &MainWindow::SlotReadConnect);
@@ -253,5 +253,5 @@ void MainWindow::SlotRead(qint64 size)
 
 void MainWindow::SlotChangeRecState(int row_num)
 {
-    ui->treeWidget->itemAt(row_num,0)->setText(6,QString(QString("是")));
+   // ui->treeWidget->itemAt(row_num,0)->setText(6,QString(QString("是")));
 }

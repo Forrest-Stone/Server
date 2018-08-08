@@ -1,7 +1,10 @@
+﻿
 
 #include "count_dialog.h"
 #include "ui_count_dialog.h"
 #include "chargemanage.h"
+#define MAX_COUNT 0
+#define MIN_COUNT 100000
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -25,6 +28,8 @@ Count_Dialog::Count_Dialog(QWidget *parent) :
     ui->start_dateTimeEdit->setDateTime(QDateTime(QDate(2018,8,1),QTime(0,0)));
     ui->end_dateTimeEdit->setDateTimeRange(ui->start_dateTimeEdit->dateTime(),QDateTime::currentDateTime());
     ui->end_dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    ui->Count_label->setText(QString::number(ChargeManage::carsFlow(ui->start_dateTimeEdit->dateTime(),
+                                                                    ui->end_dateTimeEdit->dateTime())));
 
     New_lineChart(ui->start_dateTimeEdit->dateTime(),
                   ui->end_dateTimeEdit->dateTime());
@@ -45,6 +50,7 @@ Count_Dialog::~Count_Dialog()
 
 void Count_Dialog::Change_Chart(const QDateTime &start, const QDateTime &end)
 {
+    ui->Count_label->setText(QString::number(ChargeManage::carsFlow(start,end)));
     New_lineChart_XAaxis(start,end);
     New_lineSeries(start,end);
     New_barSeries(start,end);
@@ -76,7 +82,7 @@ void Count_Dialog::New_lineChart(const QDateTime &start, const QDateTime &end)
 
     lineChart->addSeries(lineSeries);
     //lineChart->createDefaultAxes();  // 基于已添加到图表的 series 来创建轴
-    lineChart->setTitle("title");
+    lineChart->setTitle("日车流量折线图");
     //lineChart->legend()->setAlignment(Qt::AlignBottom);
     lineChart->legend()->hide();
     lineChart->setAnimationOptions(QChart::SeriesAnimations);
@@ -128,11 +134,13 @@ void Count_Dialog::New_lineChart_YAaxis(int min, int max)
 void Count_Dialog::New_lineSeries(const QDateTime &start, const QDateTime &end)
 {
     QDateTime temps,tempe;
-    int max=0,min=0,value;
+    int max,min,value;
     lineSeries->clear();
     //从数据库查数据
     int count;
     int format = Time_Format(start,end,count);
+    max = MAX_COUNT;
+    min = MIN_COUNT;
     if(format == 0){
         qDebug()<<"error";
     }else if(format == 1){
@@ -201,7 +209,7 @@ void Count_Dialog::New_barChart(const QDateTime &start, const QDateTime &end)
 
     barChart->addSeries(barSeries);
     barChart->createDefaultAxes();  // 基于已添加到图表的 series 来创建轴
-    barChart->setTitle("title2");
+    barChart->setTitle("各站点日车流量柱状图");
     barChart->legend()->setAlignment(Qt::AlignBottom);
     //lineChart->legend()->hide();
     barChart->setAnimationOptions(QChart::SeriesAnimations);
@@ -228,7 +236,7 @@ void Count_Dialog::New_barSeries(const QDateTime &start, const QDateTime &end)
 {
     QStringList lists;
     lists<<ChargeManage::getAddrs();
-    int max=0,min=0,value;
+    int max,min,value;
     QDateTime temps,tempe;
     temps.setDate(start.date());
     temps.setTime(QTime(0,0));
@@ -237,18 +245,19 @@ void Count_Dialog::New_barSeries(const QDateTime &start, const QDateTime &end)
 
     barSeries->clear();
 
-    QList<QBarSet*> barsets;
+    QBarSet* barsets = new QBarSet("车流量");
+    max = MAX_COUNT;
+    min = MIN_COUNT;
     for(QStringList::iterator iter=lists.begin();iter!=lists.end();++iter){
-        QBarSet * set = new QBarSet(*iter);
         value=ChargeManage::carsFlow(temps,tempe,*iter);
         if(value > max) max = value;
         if(value < min) min = value;
-        *set<<value;
-        barsets.push_back(set);
+        *barsets<<value;
     }
     barSeries->append(barsets);
 
     New_barChart_YAaxis(min,max);
+    ui->max_Count_label->setText(QString::number(max));
 }
 
 int Count_Dialog::Time_Format(const QDateTime &start, const QDateTime &end, int &count)

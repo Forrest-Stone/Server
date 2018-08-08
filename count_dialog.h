@@ -2,6 +2,7 @@
 #define COUNT_DIALOG_H
 
 #pragma execution_character_set("utf-8")
+
 #include <QDialog>
 #include <QtCharts>
 

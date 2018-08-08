@@ -24,11 +24,8 @@
 #include "showpicture.h"
 #include "connection.h"
 
-<<<<<<< HEAD
 #include "count_dialog.h"
 
-=======
->>>>>>> 8eac076cd50a4990b2ac9b2b15b41fd766426ab4
 using namespace std;
 using namespace cv;
 
@@ -39,21 +36,16 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    createConnection();
+    createTables();
     MainWindow w;
-<<<<<<< HEAD
     Count_Dialog d;
     d.show();
 //    ShowPicture ss;
 //    ss.show();
 
-    //createConnection();
-    //createTables();
 
-=======
 
-    createConnection();
-    createTables();
->>>>>>> 8eac076cd50a4990b2ac9b2b15b41fd766426ab4
 
     return a.exec();
 }

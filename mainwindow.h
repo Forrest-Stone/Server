@@ -77,7 +77,7 @@ private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
     Server_Login_Dialog *login  = nullptr;
-    ShowPicture *sp = nullptr;
+    //ShowPicture *sp = nullptr;
     SessionInfoList sessionList_;
     void Write(const QString &msg);
     QString GetHostIpAddr();
