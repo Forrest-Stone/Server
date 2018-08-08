@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>434</height>
+    <width>744</width>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -179,37 +179,6 @@ QHeaderView::section {
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>客户端连接状态</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QTableWidget" name="tableWidget">
-          <column>
-           <property name="text">
-            <string>客户端IP</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>客户ID</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>客户地址</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>客户进出flag</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
         <string>图片接收状态</string>
@@ -256,6 +225,37 @@ QHeaderView::section {
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>客户端连接状态</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QTableWidget" name="tableWidget">
+          <column>
+           <property name="text">
+            <string>客户端IP</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>客户ID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>客户地址</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>客户进出flag</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -265,7 +265,7 @@ QHeaderView::section {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>744</width>
      <height>23</height>
     </rect>
    </property>

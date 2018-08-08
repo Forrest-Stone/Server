@@ -27,6 +27,7 @@
 #include "login_handler.h"
 #include "sessioninfo.h"
 #include "sessioninfolist.h"
+#include "showpicture.h"
 
 #define STARTSERVER "开启监听"
 #define STOPSERVER "关闭监听"
@@ -52,8 +53,12 @@ public:
     QString GetCurrentTime();
     void AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession);
 
+public slots:
+    void SlotChangeRecState(int row_num);
+
     QString GetFileSavePath();
     void sendFileSavePath();
+
 private slots:
     void on_pushButton_clicked();
 
@@ -62,8 +67,8 @@ private slots:
     void SlotDisConnected();
     void SlotRead(qint64 size);
     void SlotReadClient(QString client);
-
     void SlotReadConnect(QString info);
+
     void SlotReadFileName( QString fileName);
     void SlotReadFilePath(QString path);
     void SlotReadFileSize(qint64 size);
@@ -72,6 +77,7 @@ private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
     Server_Login_Dialog *login  = nullptr;
+    ShowPicture *sp = nullptr;
     SessionInfoList sessionList_;
     void Write(const QString &msg);
     QString GetHostIpAddr();
