@@ -1,6 +1,7 @@
 
 #include "count_dialog.h"
 #include "ui_count_dialog.h"
+#include "chargemanage.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -46,6 +47,7 @@ void Count_Dialog::Change_Chart(const QDateTime &start, const QDateTime &end)
 {
     New_lineChart_XAaxis(start,end);
     New_lineSeries(start,end);
+    New_barSeries(start,end);
 }
 
 void Count_Dialog::on_start_dateTimeEdit_dateTimeChanged(const QDateTime &dateTime)
@@ -70,6 +72,7 @@ void Count_Dialog::New_lineChart(const QDateTime &start, const QDateTime &end)
 
     lineSeries->setPointLabelsVisible();
     lineSeries->setPointLabelsFormat("@yPoint");
+    lineSeries->setPointLabelsClipping();
 
     lineChart->addSeries(lineSeries);
     //lineChart->createDefaultAxes();  // 基于已添加到图表的 series 来创建轴
@@ -85,23 +88,35 @@ void Count_Dialog::New_lineChart(const QDateTime &start, const QDateTime &end)
 
 void Count_Dialog::New_lineChart_XAaxis(const QDateTime &start, const QDateTime &end)
 {
-    int years=end.date().year() - start.date().year();
-    if(years > 0){
+    int count;
+    int format= Time_Format(start,end,count);
+    QDateTime temps,tempe;
+    if(format == 0){
+        qDebug()<<"error";
+    }else if(format == 1){
         lineChart_XAxis->setFormat("yyyy");
-        lineChart_XAxis->setTickCount(years+1);
+        temps.setDate(QDate(start.date().year(),1,1));
+        temps.setTime(QTime(0,0));
+        tempe.setDate(QDate(end.date().year(),1,1));
+        tempe.setTime(QTime(0,0));
+    }else if(format == 2){
+        lineChart_XAxis->setFormat("yyyy/MM");
+        temps.setDate(QDate(start.date().year(),start.date().month(),1));
+        temps.setTime(QTime(0,0));
+        tempe.setDate(QDate(end.date().year(),end.date().month(),1));
+        tempe.setTime(QTime(0,0));
+    }else if(format == 3){
+        lineChart_XAxis->setFormat("yyyy/MM/dd");
+        temps.setDate(start.date());
+        temps.setTime(QTime(0,0));
+        tempe.setDate(end.date());
+        tempe.setTime(QTime(0,0));
     }else{
-        int months=end.date().month() - start.date().month();
-        if(months > 0){
-            lineChart_XAxis->setFormat("yyyy/MM");
-            lineChart_XAxis->setTickCount(months+1);
-        }else{
-            int days=start.daysTo(end);
-            lineChart_XAxis->setFormat("yyyy/MM/dd");
-            lineChart_XAxis->setTickCount(days+1);
-        }
+        qDebug()<<"error";
     }
 
-    lineChart_XAxis->setRange(start,end);
+    lineChart_XAxis->setTickCount(count);
+    lineChart_XAxis->setRange(temps,tempe);
 }
 
 void Count_Dialog::New_lineChart_YAaxis(int min, int max)
@@ -112,16 +127,67 @@ void Count_Dialog::New_lineChart_YAaxis(int min, int max)
 
 void Count_Dialog::New_lineSeries(const QDateTime &start, const QDateTime &end)
 {
-
+    QDateTime temps,tempe;
+    int max=0,min=0,value;
     lineSeries->clear();
     //从数据库查数据
+    int count;
+    int format = Time_Format(start,end,count);
+    if(format == 0){
+        qDebug()<<"error";
+    }else if(format == 1){
+        temps.setDate(QDate(start.date().year(),1,1));
+        temps.setTime(QTime(0,0));
+        tempe.setDate(QDate(start.date().year()+1,1,1));
+        tempe.setTime(QTime(0,0));
+        for(int i=0;i<count;++i){
+            value = ChargeManage::carsFlow(temps,tempe);
+            lineSeries->append(temps.toMSecsSinceEpoch(),
+                              value );
+            //                   temps.date().year());
+            temps = temps.addYears(1);
+            tempe = tempe.addYears(1);
+            if(value > max) max == value;
+            if(value < min) min ==value;
+        }
+    }else if(format == 2){
+        temps.setDate(QDate(start.date().year(),start.date().month(),1));
+        temps.setTime(QTime(0,0));
+        tempe.setDate(QDate(start.date().year(),start.date().month()+1,1));
+        tempe.setTime(QTime(0,0));
+        for(int i=0;i<count;++i){
+            value = ChargeManage::carsFlow(temps,tempe);
+            lineSeries->append(temps.toMSecsSinceEpoch(),
+                              value );
+            //                   temps.date().year());
+            temps = temps.addMonths(1);
+            tempe = tempe.addMonths(1);
+            if(value > max) max == value;
+            if(value < min) min ==value;
+        }
+    }else if(format == 3){
+        temps.setDate(start.date());
+        temps.setTime(QTime(0,0));
+        tempe.setDate(start.addDays(1).date());
+        tempe.setTime(QTime(0,0));
+        for(int i=0;i<count;++i){
+            value = ChargeManage::carsFlow(temps,tempe);
+            lineSeries->append(temps.toMSecsSinceEpoch(),
+                              value );
+            //                   temps.date().year());
+            temps = temps.addDays(1);
+            tempe = tempe.addDays(1);
+            if(value > max) max == value;
+            if(value < min) min ==value;
+        }
+    }
+
 
     //添加到数据
 
-    lineSeries->append(start.toMSecsSinceEpoch(),start.toString("MMdd").toInt());
-    lineSeries->append(end.toMSecsSinceEpoch(),end.toString("MMdd").toInt());
 
-    New_lineChart_YAaxis(start.toString("MMdd").toInt(),end.toString("MMdd").toInt());
+    New_lineChart_YAaxis(min,max);
+    //New_lineChart_YAaxis(2000,2018);
 }
 
 void Count_Dialog::New_barChart(const QDateTime &start, const QDateTime &end)
@@ -147,6 +213,7 @@ void Count_Dialog::New_barChart(const QDateTime &start, const QDateTime &end)
 void Count_Dialog::New_barChart_XAaxis()
 {
     QStringList categories;
+    //添加站信息
     categories<<"0"<<"1";
     barChart_XAxis->append(categories);
 }
@@ -169,4 +236,32 @@ void Count_Dialog::New_barSeries(const QDateTime &, const QDateTime &)
     barSeries->append(barsets);
 
     New_barChart_YAaxis(0,2);
+}
+
+int Count_Dialog::Time_Format(const QDateTime &start, const QDateTime &end, int &count)
+{
+    int years=end.date().year() - start.date().year();
+    if(years < 0){
+        return 0;
+    }
+    if(years > 0){
+        count = years+1;
+        return 1;
+    }else{
+        int months=end.date().month() - start.date().month();
+        if(months < 0){
+            return 0;
+        }
+        if(months > 0){
+            count = months+1;
+            return 2;
+        }else{
+            int days = end.date().day()-start.date().day();
+            if(days < 0){
+                return 0;
+            }
+            count = days+1;
+            return 3;
+        }
+    }
 }
