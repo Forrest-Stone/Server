@@ -147,8 +147,8 @@ void Count_Dialog::New_lineSeries(const QDateTime &start, const QDateTime &end)
             //                   temps.date().year());
             temps = temps.addYears(1);
             tempe = tempe.addYears(1);
-            if(value > max) max == value;
-            if(value < min) min ==value;
+            if(value > max) max = value;
+            if(value < min) min = value;
         }
     }else if(format == 2){
         temps.setDate(QDate(start.date().year(),start.date().month(),1));
@@ -162,8 +162,8 @@ void Count_Dialog::New_lineSeries(const QDateTime &start, const QDateTime &end)
             //                   temps.date().year());
             temps = temps.addMonths(1);
             tempe = tempe.addMonths(1);
-            if(value > max) max == value;
-            if(value < min) min ==value;
+            if(value > max) max = value;
+            if(value < min) min = value;
         }
     }else if(format == 3){
         temps.setDate(start.date());
@@ -177,8 +177,8 @@ void Count_Dialog::New_lineSeries(const QDateTime &start, const QDateTime &end)
             //                   temps.date().year());
             temps = temps.addDays(1);
             tempe = tempe.addDays(1);
-            if(value > max) max == value;
-            if(value < min) min ==value;
+            if(value > max) max = value;
+            if(value < min) min = value;
         }
     }
 
@@ -214,7 +214,7 @@ void Count_Dialog::New_barChart_XAaxis()
 {
     QStringList categories;
     //添加站信息
-    categories<<"0"<<"1";
+    categories<<ChargeManage::getAddrs();
     barChart_XAxis->append(categories);
 }
 
@@ -224,18 +224,31 @@ void Count_Dialog::New_barChart_YAaxis(int min, int max)
     barChart_YAxis->setTickCount(10);
 }
 
-void Count_Dialog::New_barSeries(const QDateTime &, const QDateTime &)
+void Count_Dialog::New_barSeries(const QDateTime &start, const QDateTime &end)
 {
+    QStringList lists;
+    lists<<ChargeManage::getAddrs();
+    int max=0,min=0,value;
+    QDateTime temps,tempe;
+    temps.setDate(start.date());
+    temps.setTime(QTime(0,0));
+    tempe.setDate(end.addDays(1).date());
+    temps.setTime(QTime(0,0));
+
     barSeries->clear();
+
     QList<QBarSet*> barsets;
-    for(int i=0;i<2;++i){
-        QBarSet * set = new QBarSet(QString::number(i));
-        *set<<i<<i+1;
+    for(QStringList::iterator iter=lists.begin();iter!=lists.end();++iter){
+        QBarSet * set = new QBarSet(*iter);
+        value=ChargeManage::carsFlow(temps,tempe,*iter);
+        if(value > max) max = value;
+        if(value < min) min = value;
+        *set<<value;
         barsets.push_back(set);
     }
     barSeries->append(barsets);
 
-    New_barChart_YAaxis(0,2);
+    New_barChart_YAaxis(min,max);
 }
 
 int Count_Dialog::Time_Format(const QDateTime &start, const QDateTime &end, int &count)
