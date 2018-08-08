@@ -51,6 +51,8 @@ public:
     QString GetFileSavePath();
     void AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession);
 
+public slots:
+    void SlotChangeRecState(int row_num);
 private slots:
     void on_pushButton_clicked();
 
@@ -61,6 +63,8 @@ private slots:
     void SlotReadClient(SessionInfo *info, QString);
 
     void SlotReadConnect(QString info);
+    void on_treeWidget_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;

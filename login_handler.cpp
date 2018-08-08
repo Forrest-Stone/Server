@@ -1,4 +1,5 @@
 ﻿#include "login_handler.h"
+#include <QThread>
 #include <QDebug>
 #include <QHostAddress>
 #include <QByteArray>
@@ -19,6 +20,8 @@ login_handler::login_handler(QObject*parent):QObject(parent)
 //这个函数负责用户登录
 void login_handler::user_login(unsigned int ip_addr,QByteArray&array,string&str_array,QTcpSocket*a)
 {
+
+    qDebug()<<"login_handler thread:"<<QThread::currentThreadId();
     lock_guard<mutex> lockg(this->lock);
     User_Detail user_detail;
     temp_data[ip_addr]+=str_array;
@@ -58,6 +61,7 @@ void login_handler::user_login(unsigned int ip_addr,QByteArray&array,string&str_
             gp->ui->tableWidget->setItem(rowNum,1,new QTableWidgetItem(QString::number(user_detail.user_id)));
             gp->ui->tableWidget->setItem(rowNum,2,new QTableWidgetItem(QString::number(user_detail.user_addr)));
             gp->ui->tableWidget->setItem(rowNum,3,new QTableWidgetItem(QString::number(user_detail.user_flag)));
+            qApp->processEvents();
         }
         temp_data.erase(ip_addr);
         QByteArray send_array(QString::number(res).toStdString().c_str());
@@ -78,6 +82,7 @@ void login_handler::user_logout(unsigned int ip_addr)
         gp->ui->tableWidget->removeRow(rowNum);
         user_map.erase(ip_addr);
         ip_row_map.erase(ip_addr);
+        qApp->processEvents();
     }
 }
 
@@ -110,8 +115,8 @@ void login_handler::operator ()(QTcpSocket* a)
 
 int login_handler::sql_judge(string user_name, string pwd,User_Detail&user_detail)
 {
-    QSqlDatabase db=QSqlDatabase::database();
-    QSqlQuery query;
+    QSqlDatabase db=QSqlDatabase::database(QString::number((long long)QThread::currentThreadId()));
+    QSqlQuery query(db);
     string user_pwd;
     query.exec(QString("select * from user where user_name='%1'").arg(QString(user_name.c_str())));
     if(query.next())

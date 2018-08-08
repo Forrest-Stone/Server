@@ -209,3 +209,13 @@ void MainWindow::SlotReadConnect(QString info)
     clietInfo += GetCurrentTime();
     this->Write(clietInfo);
 }
+
+void MainWindow::SlotChangeRecState(int row_num)
+{
+    ui->treeWidget->itemAt(row_num,0)->setText(6,QString(QString("是")));
+}
+
+void MainWindow::on_treeWidget_doubleClicked(const QModelIndex &index)
+{
+    sp->myshow(index.row());
+}

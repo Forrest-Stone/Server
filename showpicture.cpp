@@ -11,6 +11,10 @@
 using namespace cv;
 using namespace easypr;
 #pragma execution_character_set("utf-8")
+ unordered_map<int,QString>  ShowPicture::license;
+ unordered_map<int,QString>  ShowPicture::final_res;
+ unordered_map<int,QString>  ShowPicture::path;
+ int ShowPicture::row_num;
 ShowPicture::ShowPicture(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ShowPicture)
@@ -19,7 +23,7 @@ ShowPicture::ShowPicture(QWidget *parent) :
     ui->lineEdit->setFocusPolicy(Qt::NoFocus);
     ui->lineEdit_2->setMaxLength(7);
     ui->pushButton_3->setEnabled(false);
-    connect(this,SIGNAL(has_rec(int)),static_cast<MainWindow*>(this->parent()),SLOT(SlotChangeRecState(int)));
+    connect(this,SIGNAL(has_check(int)),static_cast<MainWindow*>(this->parent()),SLOT(SlotChangeRecState(int)));
 //    ui->label->show();
 
 //    QPixmap pixmap(normalIcon);
@@ -43,7 +47,6 @@ void ShowPicture::recognize(QString& file_path, int row_num)
     qDebug()<<QString("结果： ")<<res;
     license.insert(make_pair(row_num,res));
     path.insert(make_pair(row_num,file_path));
-    emit has_rec(row_num);
 }
 
 ShowPicture::~ShowPicture()
@@ -51,13 +54,21 @@ ShowPicture::~ShowPicture()
     delete ui;
 }
 
-//等那个DBM搞完再写吧
+void ShowPicture::myshow(int row_num)
+{
+    row_num = row_num;
+    ui->label->setPixmap(path[row_num]);
+    ui->lineEdit->setText(license[row_num]);
+    this->show();
+}
+
 void ShowPicture::check_out()
 {
     final_res[row_num] = ui->lineEdit_2->text();
     QSqlQuery query;
     query.exec(QString("insert into picture values(,%1,%2)").arg(final_res[row_num]).arg(path[row_num]));
     qDebug()<<query.lastError();
+    emit has_check(row_num);
 
 }
 
