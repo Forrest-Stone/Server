@@ -11,6 +11,12 @@ SessionInfo::SessionInfo(std::shared_ptr<Receive_TcpSession> &session)
             this, &SessionInfo::SignalConnected);
     connect(this->session_.get(), &Receive_TcpSession::SignalClientIP,
             this, &SessionInfo::SlotReadClient);
+    connect(this->session_.get(), &Receive_TcpSession::SignalReadFileName,
+            this, &SessionInfo::SlotReadFileName);
+    connect(this->session_.get(), &Receive_TcpSession::SignalReadFilePath,
+            this, &SessionInfo::SlotReadFilePath);
+    connect(this->session_.get(), &Receive_TcpSession::SignalReadFileSize,
+            this, &SessionInfo::SlotReadFileSize);
 }
 
 SessionInfo::~SessionInfo()
@@ -23,17 +29,16 @@ SessionInfo::~SessionInfo()
     disconnect(this->session_.get(), &Receive_TcpSession::SignalRead,
                this, &SessionInfo::SlotRead);
     disconnect(this->session_.get(), &Receive_TcpSession::connected,
-            this, &SessionInfo::SignalConnected);
+               this, &SessionInfo::SignalConnected);
     disconnect(this->session_.get(), &Receive_TcpSession::SignalClientIP,
-            this, &SessionInfo::SlotReadClient);
+               this, &SessionInfo::SlotReadClient);
+    disconnect(this->session_.get(), &Receive_TcpSession::SignalReadFileName,
+               this, &SessionInfo::SlotReadFileName);
+    disconnect(this->session_.get(), &Receive_TcpSession::SignalReadFilePath,
+               this, &SessionInfo::SlotReadFilePath);
+    disconnect(this->session_.get(), &Receive_TcpSession::SignalReadFileSize,
+               this, &SessionInfo::SlotReadFileSize);
     this->session_ = nullptr;
-}
-
-void SessionInfo::Connect(const QString &host, quint16 port)
-{
-    if(this->session_) {
-        this->session_->ConnectToServer(host, port);
-    }
 }
 
 void SessionInfo::Disconnect()
@@ -43,21 +48,29 @@ void SessionInfo::Disconnect()
     }
 }
 
-void SessionInfo::Write(const char *buffer, int size)
-{
-    if(this->session_) {
-        this->session_->Write(buffer, size);
-    }
-}
-
 void SessionInfo::SlotRead(qint64 size)
 {
-    emit this->SignalRead(this, size);
+    emit this->SignalRead(size);
 }
 
 void SessionInfo::SlotReadClient(QString client)
 {
-    emit this->SignalReadClient(this, client);
+    emit this->SignalReadClient(client);
+}
+
+void SessionInfo::SlotReadFileName(QString fileName)
+{
+    emit this->SignalReadFileName(fileName);
+}
+
+void SessionInfo::SlotReadFilePath(QString path)
+{
+    emit this->SignalReadFilePath(path);
+}
+
+void SessionInfo::SlotReadFileSize(qint64 size)
+{
+    emit this->SignalReadFileSize(size);
 }
 
 void SessionInfo::SlotDisconnected()

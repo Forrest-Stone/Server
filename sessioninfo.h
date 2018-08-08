@@ -14,19 +14,17 @@ public:
     SessionInfo(std::shared_ptr<Receive_TcpSession> &session);
     ~SessionInfo();
 
-    //连接到服务端
-    void Connect(const QString &host, quint16 port);
     //断开连接
     void Disconnect();
-    //发送数据默认加密
-    void Write(const char*buffer, int size);
 
 signals:
-    void SignalRead(SessionInfo*, qint64 size);
-    void SignalReadClient(SessionInfo*, QString);
+    void SignalRead(qint64 size);
+    void SignalReadClient(QString);
+    void SignalReadFileName(QString fileName);
+    void SignalReadFilePath(QString path);
+    void SignalReadFileSize(qint64 size);
     void SignalDisconnect();
     void SignalConnected();
-
 
 public:
     //断开连接回调
@@ -37,6 +35,9 @@ private slots:
     void SlotReadClient(QString client);
     void SlotDisconnected();
 
+    void SlotReadFileName(QString fileName);
+    void SlotReadFilePath(QString path);
+    void SlotReadFileSize(qint64 size);
 private:
     std::shared_ptr<Receive_TcpSession> session_;
 };

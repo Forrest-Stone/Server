@@ -23,7 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
+    connect(server_, &Receive_TcpServer::SignalReadConnect,
+            this, &MainWindow::SlotReadConnect);
     login->show();
+    this->sendFileSavePath();
 }
 
 MainWindow::~MainWindow()
@@ -79,12 +82,18 @@ void MainWindow::AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession)
 {
     qDebug() << "主窗口关联接收的请求！";
     SessionInfo *info = this->sessionList_.NewSessionInfo(tcpSession);
-    connect(info, &SessionInfo::SignalDisconnect, this, &MainWindow::SlotDisConnected);
-    connect(info, &SessionInfo::SignalRead, this, &MainWindow::SlotRead);
-    connect(info, &SessionInfo::SignalReadClient, this, &MainWindow::SlotReadClient);
-//    qDebug() << tcpSession.Receive_TcpSession::GetClientIP();
-
-    this->Write("Accept One");
+    connect(info, &SessionInfo::SignalDisconnect,
+            this, &MainWindow::SlotDisConnected);
+    connect(info, &SessionInfo::SignalRead,
+            this, &MainWindow::SlotRead);
+    connect(info, &SessionInfo::SignalReadClient,
+            this, &MainWindow::SlotReadClient);
+    connect(info, &SessionInfo::SignalReadFileName,
+            this, &MainWindow::SlotReadFileName);
+    connect(info, &SessionInfo::SignalReadFilePath,
+            this, &MainWindow::SlotReadFilePath);
+    connect(info, &SessionInfo::SignalReadFileSize,
+            this, &MainWindow::SlotReadFileSize);
 }
 
 void MainWindow::Write(const QString &msg)
@@ -140,7 +149,7 @@ void MainWindow::on_pushButton_2_clicked()
     QString filePath = QFileDialog::getExistingDirectory(this, "选择文件保存路径",
                                                          QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
     this->ui->lineEdit_3->setText(filePath);
-
+    this->sendFileSavePath();
 }
 
 // 获取当前系统时间 输出结果到界面显示
@@ -163,22 +172,70 @@ QString MainWindow::GetFileSavePath()
     return path;
 }
 
+void MainWindow::sendFileSavePath()
+{
+    savePath = this->GetFileSavePath();
+}
 
 void MainWindow::SlotDisConnected()
 {
     this->Write("Disconnected");
 }
 
-void MainWindow::SlotRead(SessionInfo *info, qint64 size)
+void MainWindow::SlotRead(qint64 size)
 {
-//    QString
-//    QString msg = data;
-//    this->Write(msg);
-//    info->Write(data.toStdString().c_str(), size);
+    //    QString
+    //    QString msg = data;
+    //    this->Write(msg);
+    //    info->Write(data.toStdString().c_str(), size);
 }
 
-void MainWindow::SlotReadClient(SessionInfo *info, QString client)
+void MainWindow::SlotReadConnect(QString info)
 {
-    QString ip = client;
-    this->Write(ip);
+    QString clietInfo = QString("服务器接收客户端：" + info);
+    clietInfo += QString(" 的发送文件请求！");
+    clietInfo += GetCurrentTime();
+    this->Write(clietInfo);
+}
+
+/**
+  ---------------------------------------------------------
+  * @file         File Name: mainwindows.cpp
+  * @function     Function Name: SlotReadClient
+  * @brief        Description: 在主界面显示客户端连接状态
+  * @date         Date: 2018-08-06 14:26:54 周一
+  * @param        Parameter: Sesssion *info QString client
+  * @return       Return Code: ReturnType
+  * @author       Author: 张岩森
+  ---------------------------------------------------------
+  * */
+void MainWindow::SlotReadClient(QString client)
+{
+    int rowNum = ui->tableWidget_2->rowCount();
+    ui->tableWidget_2->insertRow(rowNum);
+    ui->tableWidget_2->setItem(rowNum, 0, new QTableWidgetItem(client));
+    ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("否"));
+    ui->tableWidget_2->setItem(rowNum, 6, new QTableWidgetItem("否"));
+    QString clietInfo = QString("客户端IP：" + client);
+    clietInfo += QString(" 向服务器发送文件 ");
+    clietInfo += GetCurrentTime();
+    this->Write(clietInfo);
+}
+
+void MainWindow::SlotReadFileName(QString fileName)
+{
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 1, new QTableWidgetItem(fileName));
+}
+
+void MainWindow::SlotReadFilePath(QString path)
+{
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 4, new QTableWidgetItem(path));
+}
+
+void MainWindow::SlotReadFileSize(qint64 size)
+{
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 2, new QTableWidgetItem(QString::number(size)));
 }

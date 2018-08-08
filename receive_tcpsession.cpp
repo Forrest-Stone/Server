@@ -34,12 +34,10 @@ Receive_TcpSession::Receive_TcpSession(Receive_TcpThread *parent)
             this, &Receive_TcpSession::SlotDisConnected);
     connect(this, &Receive_TcpSession::SignalDoDisConnect,
             this, &Receive_TcpSession::SlotDoDisconnect);
-    connect(this, &Receive_TcpSession::SignalDoWrite,
-            this, &Receive_TcpSession::SlotDoWrite);
     connect(this, &Receive_TcpSession::SignalDoConnectToServer,
             this, &Receive_TcpSession::SlotDoConnectToServer);
-    connect(this, &Receive_TcpSession::SignalClientIP,
-            this, &Receive_TcpSession::SlotReadClientIP);
+    connect(this, SIGNAL(error(QAbstractSocket::SocketError)),
+            this, SLOT(SlotDisplayErrorMessage(QAbstractSocket::SocketError)));
 }
 
 Receive_TcpSession::~Receive_TcpSession()
@@ -50,17 +48,10 @@ Receive_TcpSession::~Receive_TcpSession()
                this, &Receive_TcpSession::SlotDisConnected);
     disconnect(this, &Receive_TcpSession::SignalDoDisConnect,
                this, &Receive_TcpSession::SlotDoDisconnect);
-    disconnect(this, &Receive_TcpSession::SignalDoWrite,
-               this, &Receive_TcpSession::SlotDoWrite);
     disconnect(this, &Receive_TcpSession::SignalDoConnectToServer,
                this, &Receive_TcpSession::SlotDoConnectToServer);
-    disconnect(this, &Receive_TcpSession::SignalClientIP,
-               this, &Receive_TcpSession::SlotReadClientIP);
-}
-
-void Receive_TcpSession::ConnectToServer(const QString &host, quint16 port)
-{
-    emit this->SignalDoConnectToServer(host, port);
+    disconnect(this, SIGNAL(error(QAbstractSocket::SocketError)),
+               this, SLOT(SlotDisplayErrorMessage(QAbstractSocket::SocketError)));
 }
 
 // 断开连接
@@ -70,10 +61,9 @@ void Receive_TcpSession::Disconnect()
     emit this->SignalDoDisConnect();
 }
 
-void Receive_TcpSession::Write(const char *data, qint64 len)
+void Receive_TcpSession::SlotDoDisconnect()
 {
-    writeBuffer_ = QByteArray(data, len);
-    emit this->SignalDoWrite();
+    this->disconnectFromHost();
 }
 
 void Receive_TcpSession::SlotDoConnectToServer(const QString &host, quint16 port)
@@ -81,13 +71,26 @@ void Receive_TcpSession::SlotDoConnectToServer(const QString &host, quint16 port
     this->connectToHost(QHostAddress(host), port);
 }
 
+void Receive_TcpSession::ConnectToServer(const QString &host, quint16 port)
+{
+    emit this->SignalDoConnectToServer(host, port);
+}
+
+void Receive_TcpSession::SlotDisConnected()
+{
+    if(thread_)
+        thread_->SubOne();
+    // 通知会话断开连接
+    if(OnDisConnected)
+        OnDisConnected(this);
+    emit this->SignalDisConnected(this);
+}
 void Receive_TcpSession::SlotStartRead()
 {
     qDebug()<<"开始建立连接传输数据了";
     qDebug() << "Receive_TcpSession::SlotStartRead threadID:"<< QThread::currentThreadId();
     while(this->bytesAvailable() >= sizeof(quint64)) {
-        qDebug() << this->bytesAvailable();
-//        qDebug() << sizeof(quint64);
+        //        qDebug() << this->bytesAvailable();
         if(blockSize_ == 0) {
             if(this->bytesAvailable() < sizeof(qint64)) {
                 return ;
@@ -97,40 +100,12 @@ void Receive_TcpSession::SlotStartRead()
         if(this->bytesAvailable() < blockSize_) {
             return ;
         }
-        emit SignalRead(blockSize_ + sizeof(qint64));
+        //        emit SignalRead(blockSize_ + sizeof(qint64));
         QByteArray data = this->read(blockSize_);
         processFileData(data);
         blockSize_ = 0;
-        qDebug() << this->bytesAvailable();
+        //        qDebug() << this->bytesAvailable();
     }
-}
-
-void Receive_TcpSession::SlotDisConnected()
-{
-    if(thread_)
-        thread_->SubOne();
-    //通知会话断开连接
-    if(OnDisConnected)
-        OnDisConnected(this);
-    emit this->SignalDisConnected(this);
-}
-
-void Receive_TcpSession::SlotDoWrite()
-{
-
-    this->write(writeBuffer_);
-}
-
-void Receive_TcpSession::SlotReadClientIP()
-{
-    qDebug() << "读取客户端IP的信号";
-    qDebug() << this->peerAddress().toString();
-    emit SignalClientIP(this->peerAddress().toString());
-}
-
-void Receive_TcpSession::SlotDoDisconnect()
-{
-    this->disconnectFromHost();
 }
 
 void Receive_TcpSession::processFileData(QByteArray &array)
@@ -146,12 +121,21 @@ void Receive_TcpSession::processFileData(QByteArray &array)
     qDebug() << QString("已接收数据包:%1个").arg( blockNumber_);
     qDebug() << QString("收到标识符:%1 当前数据包大小:%2字节").arg(key).arg(data.size());
 
+    extern unordered_map<unsigned int,User_Detail> user_map;
+    QDir dir;
+    QString userId = QString::number(user_map[this->peerAddress().toIPv4Address()].user_id);
+    dir.cd(savePath);
+    if(!dir.exists(userId)) {
+        dir.mkdir(userId);
+        qDebug() << "创建目录成功！";
+    }
     switch(key) {
     case 0x01:
-        receiveFileName_ = receiveFileName_.fromUtf8(data);
-        qDebug() << receiveFileName_;
-        receiveFile_->setFileName(QString(QCoreApplication::applicationDirPath()) + '/' + receiveFileName_);
-        emit this->SignalReadFileName(receiveFile_->fileName());
+        receiveFileName_ = receiveFileName_.fromUtf8(data.data(), data.size());
+        receiveFile_->setFileName(savePath + '/' + userId + '/' + receiveFileName_);
+        emit this->SignalClientIP(this->peerAddress().toString());
+        emit this->SignalReadFileName(receiveFileName_);
+        emit this->SignalReadFilePath(receiveFile_->fileName());
         if(receiveFile_->exists()) {
             receiveFile_->remove();
         }
@@ -162,7 +146,6 @@ void Receive_TcpSession::processFileData(QByteArray &array)
         break;
     case 0x02: {
         QString size = QString::fromUtf8(data.data(), data.size());
-
         emit this->SignalReadFileSize(size.toUInt());
         break;
     }
@@ -173,5 +156,21 @@ void Receive_TcpSession::processFileData(QByteArray &array)
     case 0x04:
         receiveFile_->close();
         break;
+    }
+}
+
+void Receive_TcpSession::SlotDisplayErrorMessage(QAbstractSocket::SocketError)
+{
+    qDebug() << QString("接收文件遇到错误:%1[%2]").arg(this->errorString());
+    qDebug() << QString("正在移除文件:%1").arg(receiveFile_->fileName());
+    if(receiveFile_->isOpen()) {
+        receiveFile_->close();
+    } else {
+        return ;
+    }
+    if(!receiveFile_->fileName().isEmpty()) {
+        receiveFile_->remove(receiveFileName_);
+    } else {
+        return ;
     }
 }
