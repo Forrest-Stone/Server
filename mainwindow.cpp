@@ -214,6 +214,8 @@ void MainWindow::SlotReadClient(QString client)
     int rowNum = ui->tableWidget_2->rowCount();
     ui->tableWidget_2->insertRow(rowNum);
     ui->tableWidget_2->setItem(rowNum, 0, new QTableWidgetItem(client));
+    ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("否"));
+    ui->tableWidget_2->setItem(rowNum, 6, new QTableWidgetItem("否"));
     QString clietInfo = QString("客户端IP：" + client);
     clietInfo += QString(" 向服务器发送文件 ");
     clietInfo += GetCurrentTime();
