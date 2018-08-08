@@ -8,6 +8,7 @@
 #include <QThread>
 #include "login_mythread.h"
 #include <handler.h>
+#include "login_mytcpsocket.h"
 using namespace std;
 class Login_TcpServer : public QTcpServer
 {
@@ -16,7 +17,7 @@ public:
     explicit Login_TcpServer(QObject *parent,int port,int thread_num,handler&fun);
     virtual ~Login_TcpServer();
 private:
-    vector<set<QTcpSocket*>> sockets;
+    vector<set<MyTcpSocket*>> sockets;
     vector<MyThread*> threads;
     handler&fun;
    // int cur_thread;
@@ -25,11 +26,13 @@ private:
     //int socket_num;
 
     MyThread *find_thread();
+protected:
+    virtual void incomingConnection(qintptr socketDescriptor);
 signals:
 
 public slots:
 private slots:
-    void newConnectionSlot();
+   // void newConnectionSlot();
 };
 
 #endif // Login_TcpServer_H

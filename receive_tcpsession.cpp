@@ -85,12 +85,12 @@ void Receive_TcpSession::SlotDisConnected()
         OnDisConnected(this);
     emit this->SignalDisConnected(this);
 }
+
 void Receive_TcpSession::SlotStartRead()
 {
     qDebug()<<"开始建立连接传输数据了";
     qDebug() << "Receive_TcpSession::SlotStartRead threadID:"<< QThread::currentThreadId();
     while(this->bytesAvailable() >= sizeof(quint64)) {
-        //        qDebug() << this->bytesAvailable();
         if(blockSize_ == 0) {
             if(this->bytesAvailable() < sizeof(qint64)) {
                 return ;
@@ -100,11 +100,11 @@ void Receive_TcpSession::SlotStartRead()
         if(this->bytesAvailable() < blockSize_) {
             return ;
         }
-        //        emit SignalRead(blockSize_ + sizeof(qint64));
+        qDebug() << blockSize_ + sizeof(qint64);
+        emit this->SignalReadFile(blockSize_ + sizeof(qint64));
         QByteArray data = this->read(blockSize_);
         processFileData(data);
         blockSize_ = 0;
-        //        qDebug() << this->bytesAvailable();
     }
 }
 
@@ -161,7 +161,7 @@ void Receive_TcpSession::processFileData(QByteArray &array)
 
 void Receive_TcpSession::SlotDisplayErrorMessage(QAbstractSocket::SocketError)
 {
-    qDebug() << QString("接收文件遇到错误:%1[%2]").arg(this->errorString());
+    qDebug() << QString("接收文件遇到错误:%1").arg(this->errorString());
     qDebug() << QString("正在移除文件:%1").arg(receiveFile_->fileName());
     if(receiveFile_->isOpen()) {
         receiveFile_->close();

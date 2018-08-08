@@ -18,12 +18,11 @@ Login_TcpServer::Login_TcpServer(QObject *parent,int port,int thread_num,handler
     //socket_num=0;
     for(int i=0;i<thread_num;i++)
     {
-        set<QTcpSocket*> s;
+        set<MyTcpSocket*> s;
         sockets.push_back(s);
     }
     this->setMaxPendingConnections(thread_num*10);
     this->listen(QHostAddress::Any,port);
-    connect(this,SIGNAL(newConnection()),this,SLOT(newConnectionSlot()));
 }
 MyThread *Login_TcpServer::find_thread()
 {
@@ -36,25 +35,35 @@ MyThread *Login_TcpServer::find_thread()
                 threads[i]=new MyThread(this,sockets[i],fun);
                 threads[i]->start();
             }
-            else if(sockets[i].size()==0) {
-                threads[i]->start();
-            }
             return threads[i];
         }
     }
     return NULL;
 }
-void Login_TcpServer::newConnectionSlot()
-{
-    QTcpSocket*socket=this->nextPendingConnection();
-    qDebug()<<socket->peerAddress().toString()<<"  connected!";
-    MyThread*thread=find_thread();
-    if(thread==NULL)
-    {
-        qDebug()<<"没有空闲线程，连接失败！";
-        socket->disconnectFromHost();
-        return;
-    }
-    thread->add_socket(socket);
 
+void Login_TcpServer::incomingConnection(qintptr socketDescriptor)
+{
+     MyThread*thread=find_thread();
+     if(thread==NULL)
+     {
+         qDebug()<<"没有空闲线程，连接失败！";
+        // socket->disconnectFromHost();
+         return;
+     }
+     thread->add_socket(socketDescriptor);
 }
+//void Login_TcpServer::newConnectionSlot()
+//{
+//    QTcpSocket*socket=this->nextPendingConnection();
+//    qDebug()<<socket->peerAddress().toString()<<"  connected!";
+//    MyThread*thread=find_thread();
+//    socket->setParent(nullptr);
+//    if(thread==NULL)
+//    {
+//        qDebug()<<"没有空闲线程，连接失败！";
+//        socket->disconnectFromHost();
+//        return;
+//    }
+//    thread->add_socket(socket);
+
+//}
