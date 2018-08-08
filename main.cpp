@@ -33,6 +33,7 @@ using namespace cv;
 
 unordered_map<unsigned int,User_Detail> user_map;
 QString savePath;
+int number;
 
 int main(int argc, char *argv[])
 {

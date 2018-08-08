@@ -26,6 +26,7 @@ signals:
     void SignalDisconnect();
     void SignalConnected();
     void SignalProgressBar(qint64 size);
+    void SignalReadFinish();
 
 public:
     //断开连接回调
@@ -40,6 +41,7 @@ private slots:
     void SlotReadFilePath(QString path);
     void SlotReadFileSize(qint64 size);
     void SlotProgressBar(qint64 size);
+    void SlotReadFinish();
 private:
     std::shared_ptr<Receive_TcpSession> session_;
 };

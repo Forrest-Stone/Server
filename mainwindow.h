@@ -73,6 +73,7 @@ private slots:
     void SlotReadFilePath(QString path);
     void SlotReadFileSize(qint64 size);
 
+    void SlotReadFinish();
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;

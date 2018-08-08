@@ -36,6 +36,8 @@ Receive_TcpSession::Receive_TcpSession(Receive_TcpThread *parent)
             this, &Receive_TcpSession::SlotDoDisconnect);
     connect(this, &Receive_TcpSession::SignalDoConnectToServer,
             this, &Receive_TcpSession::SlotDoConnectToServer);
+    connect(this, &Receive_TcpSession::SignalReadFileFinish,
+            this, &Receive_TcpSession::SlotReadFileFinish);
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(SlotDisplayErrorMessage(QAbstractSocket::SocketError)));
 }
@@ -50,6 +52,8 @@ Receive_TcpSession::~Receive_TcpSession()
                this, &Receive_TcpSession::SlotDoDisconnect);
     disconnect(this, &Receive_TcpSession::SignalDoConnectToServer,
                this, &Receive_TcpSession::SlotDoConnectToServer);
+    disconnect(this, &Receive_TcpSession::SignalReadFileFinish,
+               this, &Receive_TcpSession::SlotReadFileFinish);
     disconnect(this, SIGNAL(error(QAbstractSocket::SocketError)),
                this, SLOT(SlotDisplayErrorMessage(QAbstractSocket::SocketError)));
 }
@@ -154,6 +158,9 @@ void Receive_TcpSession::processFileData(QByteArray &array)
         receiveFile_->flush();
         break;
     case 0x04:
+        extern int number;
+        ShowPicture::recognize(receiveFile_->fileName(), number);
+        this->SignalReadFileFinish();
         receiveFile_->close();
         break;
     }
@@ -173,4 +180,9 @@ void Receive_TcpSession::SlotDisplayErrorMessage(QAbstractSocket::SocketError)
     } else {
         return ;
     }
+}
+
+void Receive_TcpSession::SlotReadFileFinish()
+{
+    emit this->SignalReadFileFinish();
 }

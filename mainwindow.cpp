@@ -95,6 +95,8 @@ void MainWindow::AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession)
             this, &MainWindow::SlotReadFilePath);
     connect(info, &SessionInfo::SignalReadFileSize,
             this, &MainWindow::SlotReadFileSize);
+    connect(info, &SessionInfo::SignalReadFinish,
+            this, &MainWindow::SlotReadFinish);
 //    connect(info, &SessionInfo::SignalProgressBar,
 //            this, &MainWindow::SlotRead);
 }
@@ -214,8 +216,10 @@ void MainWindow::SlotReadConnect(QString info)
   * */
 void MainWindow::SlotReadClient(QString client)
 {
+    extern int number;
     progressBar = new QProgressBar;
     int rowNum = ui->tableWidget_2->rowCount();
+    number = rowNum;
     ui->tableWidget_2->insertRow(rowNum);
     ui->tableWidget_2->setItem(rowNum, 0, new QTableWidgetItem(client));
     ui->tableWidget_2->setCellWidget(rowNum, 3, progressBar);
@@ -251,7 +255,8 @@ void MainWindow::SlotRead(qint64 size)
 //    qDebug() << size;
 }
 
-void MainWindow::SlotChangeRecState(int row_num)
+void MainWindow::SlotReadFinish()
 {
-    ui->treeWidget->itemAt(row_num,0)->setText(6,QString(QString("是")));
+    int rowNum = ui->tableWidget_2->rowCount() - 1;
+    ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("是"));
 }

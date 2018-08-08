@@ -23,6 +23,7 @@
 #include <QCoreApplication>
 
 #include "receive_tcpthread.h"
+#include "showpicture.h"
 
 class Receive_TcpSession : public QTcpSocket
 {
@@ -49,6 +50,7 @@ signals:
     void SignalDisConnected(void *);
     void SignalDoDisConnect();
     void SignalDoConnectToServer(const QString &, quint16);
+    void SignalReadFileFinish();
 
     // 接收客户端有关信息
     void SignalClientIP(QString ip);
@@ -70,6 +72,7 @@ private slots:
     void ConnectToServer(const QString &host, quint16 port);
     void SlotDoConnectToServer(const QString &host, quint16 port);
     void SlotDisplayErrorMessage(QAbstractSocket::SocketError);
+    void SlotReadFileFinish();
 private:
     Receive_TcpThread *thread_ = nullptr;
     QByteArray buffer_ = nullptr;
