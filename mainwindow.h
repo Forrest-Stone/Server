@@ -19,6 +19,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QDateTime>
+#include <QTableWidgetItem>
 
 #include "receive_tcpserver.h"
 #include "server_login_dialog.h"
@@ -31,6 +32,7 @@
 #define STOPSERVER "关闭监听"
 #define PORTNUM 8888
 
+extern QString savePath;
 
 namespace Ui {
 class MainWindow;
@@ -48,22 +50,32 @@ public:
     friend class login_handler;
 
     QString GetCurrentTime();
-    QString GetFileSavePath();
     void AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession);
 
+<<<<<<< HEAD
 public slots:
     void SlotChangeRecState(int row_num);
+=======
+    QString GetFileSavePath();
+    void sendFileSavePath();
+>>>>>>> 6482fa827a8dc27e940237bfe3379b0cf2d78f56
 private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
     void SlotDisConnected();
-    void SlotRead(SessionInfo *info, qint64 size);
-    void SlotReadClient(SessionInfo *info, QString);
+    void SlotRead(qint64 size);
+    void SlotReadClient(QString client);
 
     void SlotReadConnect(QString info);
+<<<<<<< HEAD
     void on_treeWidget_doubleClicked(const QModelIndex &index);
+=======
+    void SlotReadFileName( QString fileName);
+    void SlotReadFilePath(QString path);
+    void SlotReadFileSize(qint64 size);
+>>>>>>> 6482fa827a8dc27e940237bfe3379b0cf2d78f56
 
 private:
     Ui::MainWindow *ui;

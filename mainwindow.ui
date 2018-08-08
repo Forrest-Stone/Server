@@ -185,7 +185,7 @@ QHeaderView::section {
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QTreeWidget" name="treeWidget">
+         <widget class="QTableWidget" name="tableWidget_2">
           <column>
            <property name="text">
             <string>客户端IP</string>
@@ -198,7 +198,7 @@ QHeaderView::section {
           </column>
           <column>
            <property name="text">
-            <string>文件大小</string>
+            <string>图片大小</string>
            </property>
           </column>
           <column>

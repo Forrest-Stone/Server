@@ -22,49 +22,27 @@
 #include "receive_tcpserver.h"
 #include "user_detail.h"
 #include "showpicture.h"
+#include "connection.h"
+
+#include "chargemanage.h"
+#include "chargedialog.h"
+#include <QDateTime>
 
 using namespace std;
 using namespace cv;
 
 unordered_map<unsigned int,User_Detail> user_map;
+QString savePath;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     MainWindow w;
-    // 查看数据库中可用的驱动
-    qDebug() << "可用的驱动：";
-    QStringList drivers = QSqlDatabase::drivers();
-    foreach (QString driver, drivers) {
-        qDebug() << driver;
-    }
 
-    // 创建连接，使用本地的 MySQL
-    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setDatabaseName("car");
-    db.setPort(3306);
-    db.setUserName("root");
-    db.setPassword("zyszuibang");
-    bool ok = db.open();
-    if (ok)
-        qDebug() << "数据库连接成功";
-    else {
-        qDebug() << "数据库连接失败";
+    createConnection();
+    createTables();
 
-    }
-
-//    TcpServer server;
-//    server.Start(8675, 2);
-//    VideoCapture capture(0);
-//    // 循环显示每一帧
-//    while(1) {
-//        Mat frame;  // 定义一个Mat变量，用于存储每一帧的图像
-//        capture>>frame;  // 读取当前帧
-//        imshow("video",frame);  // 显示当前帧
-//        waitKey(30);  // 延时30ms
-//    }
 
     return a.exec();
 }

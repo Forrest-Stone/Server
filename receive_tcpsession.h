@@ -17,6 +17,7 @@
 #include <QHostAddress>
 #include <functional>
 #include <QFile>
+#include <QDir>
 #include <QString>
 #include <QDataStream>
 #include <QCoreApplication>
@@ -46,7 +47,6 @@ public:
 signals:
     void SignalRead(qint64 size);
     void SignalDisConnected(void *);
-    void SignalDoWrite();
     void SignalDoDisConnect();
     void SignalDoConnectToServer(const QString &, quint16);
 
@@ -57,7 +57,7 @@ signals:
     void SignalReadFile(qint64 size);
     void SignalReadFileName(const QString name);
     void SignalReadFileSize(qint64 size);
-
+    void SignalReadFilePath(QString path);
 
 private slots:
     // 开始读数据
@@ -67,7 +67,9 @@ private slots:
     // 断开连接
     void SlotDoDisconnect();
 
-
+    void ConnectToServer(const QString &host, quint16 port);
+    void SlotDoConnectToServer(const QString &host, quint16 port);
+    void SlotDisplayErrorMessage(QAbstractSocket::SocketError);
 private:
     Receive_TcpThread *thread_ = nullptr;
     QByteArray buffer_ = nullptr;
@@ -76,6 +78,7 @@ private:
     // 接收文件有关信息
     QFile *receiveFile_;            // 待接收文件
     QString receiveFileName_;       // 待接收文件名
+    QString receiveFilePath_;       // 待接收文件路径
     qint64 receiveFileTotalBytes_;  // 待接收文件总大小
     qint64 haveReceFileVytes_;      // 已经接收文件字节
     qint64 blockSize_;
