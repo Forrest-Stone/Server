@@ -94,6 +94,8 @@ void MainWindow::AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession)
             this, &MainWindow::SlotReadFilePath);
     connect(info, &SessionInfo::SignalReadFileSize,
             this, &MainWindow::SlotReadFileSize);
+//    connect(info, &SessionInfo::SignalProgressBar,
+//            this, &MainWindow::SlotRead);
 }
 
 void MainWindow::Write(const QString &msg)
@@ -182,13 +184,13 @@ void MainWindow::SlotDisConnected()
     this->Write("Disconnected");
 }
 
-void MainWindow::SlotRead(qint64 size)
-{
-    //    QString
-    //    QString msg = data;
-    //    this->Write(msg);
-    //    info->Write(data.toStdString().c_str(), size);
-}
+//void MainWindow::SlotRead(qint64 size)
+//{
+//    //    QString
+//    //    QString msg = data;
+//    //    this->Write(msg);
+//    //    info->Write(data.toStdString().c_str(), size);
+//}
 
 void MainWindow::SlotReadConnect(QString info)
 {
@@ -211,9 +213,11 @@ void MainWindow::SlotReadConnect(QString info)
   * */
 void MainWindow::SlotReadClient(QString client)
 {
+    progressBar = new QProgressBar;
     int rowNum = ui->tableWidget_2->rowCount();
     ui->tableWidget_2->insertRow(rowNum);
     ui->tableWidget_2->setItem(rowNum, 0, new QTableWidgetItem(client));
+    ui->tableWidget_2->setCellWidget(rowNum, 3, progressBar);
     ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("否"));
     ui->tableWidget_2->setItem(rowNum, 6, new QTableWidgetItem("否"));
     QString clietInfo = QString("客户端IP：" + client);
@@ -238,4 +242,9 @@ void MainWindow::SlotReadFileSize(qint64 size)
 {
     int rowNum = ui->tableWidget_2->rowCount() - 1;
     ui->tableWidget_2->setItem(rowNum, 2, new QTableWidgetItem(QString::number(size)));
+}
+
+void MainWindow::SlotRead(qint64 size)
+{
+//    qDebug() << size;
 }

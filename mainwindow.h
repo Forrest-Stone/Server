@@ -20,6 +20,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QTableWidgetItem>
+#include <QProgressBar>
 
 #include "receive_tcpserver.h"
 #include "server_login_dialog.h"
@@ -74,6 +75,7 @@ private:
     SessionInfoList sessionList_;
     void Write(const QString &msg);
     QString GetHostIpAddr();
+    QProgressBar *progressBar;
 };
 
 #endif // MAINWINDOW_H
