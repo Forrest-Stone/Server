@@ -1,9 +1,10 @@
-#ifndef COUNT_DIALOG_H
+﻿#ifndef COUNT_DIALOG_H
 #define COUNT_DIALOG_H
 
 #pragma execution_character_set("utf-8")
 #include <QDialog>
 #include <QtCharts>
+#include <QtCharts/QChart>
 
 namespace Ui {
 class Count_Dialog;

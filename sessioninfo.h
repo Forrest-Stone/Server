@@ -25,7 +25,6 @@ signals:
     void SignalReadFileSize(qint64 size);
     void SignalDisconnect();
     void SignalConnected();
-    void SignalProgressBar(qint64 size);
     void SignalReadFinish();
 
 public:
@@ -40,7 +39,6 @@ private slots:
     void SlotReadFileName(QString fileName);
     void SlotReadFilePath(QString path);
     void SlotReadFileSize(qint64 size);
-    void SlotProgressBar(qint64 size);
     void SlotReadFinish();
 private:
     std::shared_ptr<Receive_TcpSession> session_;
