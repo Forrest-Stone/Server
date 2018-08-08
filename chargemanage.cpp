@@ -129,9 +129,10 @@ void ChargeManage::showCarsMap()
 QStringList ChargeManage::getAddrs()
 {
     QStringList names;
-    m_query.exec("select addrName from addr_name");
-    while (m_query.next()) {
-        names.append(m_query.value(0).toString());
+    QSqlQuery query;
+    query.exec("select addrName from addr_name");
+    while (query.next()) {
+        names.append(query.value(0).toString());
     }
     return names;
 }
