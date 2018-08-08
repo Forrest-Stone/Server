@@ -124,3 +124,15 @@ void ChargeManage::showCarsMap()
         ++it;
     }
 }
+
+// 获取站点名
+QStringList ChargeManage::getAddrs()
+{
+    QStringList names;
+    QSqlQuery query;
+    query.exec("select addrName from addr_name");
+    while (query.next()) {
+        names.append(query.value(0).toString());
+    }
+    return names;
+}
