@@ -38,6 +38,10 @@ int main(int argc, char *argv[])
 
     createConnection();
     createTables();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8b7e82af0e96927cecba2d30c9a293b0267c3bd8
 
     return a.exec();
 }

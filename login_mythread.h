@@ -2,10 +2,12 @@
 #define MYTHREAD_H
 
 #include <QObject>
+#include <QSqlDatabase>
 #include <QThread>
 #include <QTcpSocket>
 #include <set>
 #include "handler.h"
+#include "login_mytcpsocket.h"
 using namespace std;
 /**
  * @brief The MyThread class
@@ -16,20 +18,17 @@ class MyThread :public QThread
 {
     Q_OBJECT
 public:
-    explicit MyThread(QObject *parent,set<QTcpSocket*>&sockets,handler&fun);
-    void add_socket(QTcpSocket *socket);
+    explicit MyThread(QObject *parent,set<MyTcpSocket*>&sockets,handler&fun);
+    void add_socket(qintptr socketDescriptor);
 private:
     handler&fun;
-    set<QTcpSocket*>&sockets;
+    set<MyTcpSocket*>&sockets;
 signals:
 
 public slots:
 protected:
-    //void run();
-private slots:
-    void readMessage();
-    void showConnected();
-    void remove_set();
+    void run();
+
 };
 
 #endif // MYTHREAD_H
