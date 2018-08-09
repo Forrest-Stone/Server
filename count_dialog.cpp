@@ -236,7 +236,7 @@ void Count_Dialog::New_barSeries(const QDateTime &start, const QDateTime &end)
 {
     QStringList lists;
     lists<<ChargeManage::getAddrs();
-    int max,min,value;
+    int max,min,value,value2=0;
     QDateTime temps,tempe;
     temps.setDate(start.date());
     temps.setTime(QTime(0,0));
@@ -245,17 +245,22 @@ void Count_Dialog::New_barSeries(const QDateTime &start, const QDateTime &end)
 
     barSeries->clear();
 
-    QBarSet* barsets = new QBarSet("车流量");
+    QBarSet* barsets = new QBarSet("进站车流量");
+    QBarSet* barsete = new QBarSet("出站车流量");
     max = MAX_COUNT;
     min = MIN_COUNT;
     for(QStringList::iterator iter=lists.begin();iter!=lists.end();++iter){
         value=ChargeManage::carsFlow(temps,tempe,*iter);
+        value2;
         if(value > max) max = value;
+        if(value2 > max) max = value2;
         if(value < min) min = value;
+        if(value < min) min = value2;
         *barsets<<value;
+        *barsete<<value2;
     }
     barSeries->append(barsets);
-
+    barSeries->append(barsete);
     New_barChart_YAaxis(min,max);
     ui->max_Count_label->setText(QString::number(max));
 }
