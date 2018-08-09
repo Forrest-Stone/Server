@@ -53,8 +53,8 @@ void createConnection()
     db.setDatabaseName("car");
     db.setPort(3306);
     db.setUserName("root");
-//    db.setPassword("363677052");
-    db.setPassword("zyszuibang");
+    db.setPassword("363677052");
+   // db.setPassword("zyszuibang");
     if (!db.open()) {
         qDebug() << "数据库连接失败";
     } else {

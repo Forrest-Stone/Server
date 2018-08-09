@@ -13,12 +13,12 @@
 #include <QStringList>
 #include "chargeinfo.h"
 
-class ChargeManage : QObject
+class ChargeManage : public QObject
 {
     Q_OBJECT
 
 public:
-    ChargeManage();
+    ChargeManage(QObject *parent = 0);
     ~ChargeManage();
     static int carsFlow(QDateTime start, QDateTime end, QString addr = "");   // 一段时间内的进站车流量
     static int carsFlowOut(QDateTime start, QDateTime end, QString addr);     // 一段时间内出站车流量

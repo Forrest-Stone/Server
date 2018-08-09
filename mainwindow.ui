@@ -269,6 +269,26 @@ QHeaderView::section {
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>开始</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>计费</string>
+    </property>
+    <addaction name="actionjifei"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>车流量</string>
+    </property>
+    <addaction name="actionliuliang"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -279,6 +299,16 @@ QHeaderView::section {
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionjifei">
+   <property name="text">
+    <string>查询计费</string>
+   </property>
+  </action>
+  <action name="actionliuliang">
+   <property name="text">
+    <string>统计车流量</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

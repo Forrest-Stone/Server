@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QSqlError>
 
-ChargeManage::ChargeManage()
+ChargeManage::ChargeManage(QObject *parent) : QObject(parent)
 {
     // 读取站点计费规则
     m_chargeInfo.geGraph();

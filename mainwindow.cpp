@@ -16,6 +16,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // 初始化整体布局
+    QFile file(":/style/default.css");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = tr(file.readAll());
+    this->setStyleSheet(styleSheet);
+
     ui->lineEdit->setPlaceholderText(GetHostIpAddr());
     ui->lineEdit_2->setPlaceholderText(QString::number(PORTNUM));
     ui->lineEdit_3->setPlaceholderText(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
@@ -24,10 +31,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
-    //sp = new ShowPicture(this);
+    sp = new ShowPicture(this);
+    cm = new ChargeManage(this);
+    charge_ = new ChargeDialog(this);
+    car_ = new Count_Dialog(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
     connect(server_, &Receive_TcpServer::SignalReadConnect,
             this, &MainWindow::SlotReadConnect);
+    connect(sp,SIGNAL(has_check(int)),this,SLOT(SlotCheckOut(int)));
+    connect(sp,SIGNAL(car_in(QString,int,QDateTime)),cm,SLOT(carIn(QString,int,QDateTime)));
+    connect(sp,SIGNAL(car_out(QString,int,QDateTime)),cm,SLOT(carOut(QString,int,QDateTime)));
+    connect(ui->actionjifei, SIGNAL(triggered(bool)),
+            this, SLOT(SlotCharge()));
+    connect(ui->actionliuliang, SIGNAL(triggered(bool)),
+            this, SLOT(SlotCar()));
     login->show();
     this->sendFileSavePath();
 }
@@ -184,6 +201,11 @@ void MainWindow::sendFileSavePath()
     savePath = this->GetFileSavePath();
 }
 
+void MainWindow::SlotCheckOut(int row_num)
+{
+    ui->tableWidget_2->setItem(row_num, 6, new QTableWidgetItem("是"));
+}
+
 void MainWindow::SlotDisConnected()
 {
     this->Write("Disconnected");
@@ -253,7 +275,7 @@ void MainWindow::SlotReadFileSize(qint64 size)
     ui->tableWidget_2->setItem(rowNum, 2, new QTableWidgetItem(QString::number(size)));
     receiveSize_ = 0;
     totalSize_ = size;
-    progressBar_->setRange(0, size - 1);
+    progressBar_->setRange(0, size);
     progressBar_->setValue(0);
 }
 
@@ -264,20 +286,33 @@ void MainWindow::SlotRead(qint64 size)
     progressBar_->setValue(receiveSize_);
     qDebug() << QString("当前数据包大小:%1字节 已接收字节:%2 总共字节:%3")
                 .arg(size).arg(receiveSize_).arg(totalSize_);
+    qApp->processEvents();
 }
+
+//void MainWindow::SlotUpdatePBar(qint64 size)
+//{
+//    progressBar_->setValue(size);
+//}
 
 void MainWindow::SlotReadFinish()
 {
-<<<<<<< HEAD
-   // ui->treeWidget->itemAt(row_num,0)->setText(6,QString(QString("是")));
-=======
+
     int rowNum = ui->tableWidget_2->rowCount() - 1;
-    progressBar_->setValue(100);
+    //progressBar_->setValue(100);
     ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("是"));
->>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
 }
 
 void MainWindow::on_tableWidget_2_doubleClicked(const QModelIndex &index)
 {
     sp->myshow(index.row());
+}
+
+void MainWindow::SlotCharge()
+{
+    charge_->show();
+}
+
+void MainWindow::SlotCar()
+{
+    car_->show();
 }

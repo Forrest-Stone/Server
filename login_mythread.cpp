@@ -19,7 +19,7 @@ void MyThread::run()
     db.setDatabaseName("car");
     db.setPort(3306);
     db.setUserName("root");
-    db.setPassword("zyszuibang");
+    db.setPassword("363677052");
     bool ok = db.open();
     if (ok)
         qDebug() << "数据库连接成功";

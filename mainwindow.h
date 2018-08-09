@@ -28,13 +28,16 @@
 #include "sessioninfo.h"
 #include "sessioninfolist.h"
 #include "showpicture.h"
+#include "chargemanage.h"
+#include "chargedialog.h"
+#include "count_dialog.h"
 
 #define STARTSERVER "开启监听"
 #define STOPSERVER "关闭监听"
 #define PORTNUM 8888
 
 extern QString savePath;
-
+class Count_Dialog;
 namespace Ui {
 class MainWindow;
 }
@@ -56,7 +59,7 @@ public:
 public slots:
     QString GetFileSavePath();
     void sendFileSavePath();
-
+    void SlotCheckOut(int row_num);
 private slots:
     void on_pushButton_clicked();
 
@@ -74,12 +77,16 @@ private slots:
     void SlotReadFinish();
 //    void SlotUpdatePBar(qint64 size);
     void on_tableWidget_2_doubleClicked(const QModelIndex &index);
-
+    void SlotCharge();
+    void SlotCar();
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
     Server_Login_Dialog *login  = nullptr;
-    //ShowPicture *sp = nullptr;
+    ShowPicture *sp = nullptr;
+    ChargeManage *cm = nullptr;
+    Count_Dialog *car_ = nullptr;
+    ChargeDialog *charge_ = nullptr;
     SessionInfoList sessionList_;
     void Write(const QString &msg);
     QString GetHostIpAddr();

@@ -1,19 +1,19 @@
 ﻿#include "showpicture.h"
 #include "ui_showpicture.h"
-#include "opencv2/opencv.hpp"
 #include "easypr.h" 
-#include "mainwindow.h"
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
-using namespace cv;
-using namespace easypr;
+#include "user_detail.h"
+#include <QDateTime>
+#include <QStringList>
 #pragma execution_character_set("utf-8")
- unordered_map<int,QString>  ShowPicture::license;
- unordered_map<int,QString>  ShowPicture::final_res;
- unordered_map<int,QString>  ShowPicture::path;
+ std::unordered_map<int,QString>  ShowPicture::license;
+ std::unordered_map<int,QString>  ShowPicture::final_res;
+ std::unordered_map<int,QString>  ShowPicture::path;
+ std::unordered_map<int,unsigned int> ShowPicture::row_ip;
  int ShowPicture::row_num;
 ShowPicture::ShowPicture(QWidget *parent) :
     QDialog(parent),
@@ -34,21 +34,20 @@ ShowPicture::ShowPicture(QWidget *parent) :
 //    ui->label_4->setStyleSheet("QLabel{border-image:url(:/DSCF2912111.jpg)}");
 }
 
-void ShowPicture::recognize(const QString &file_path, int row_num)
+void ShowPicture::recognize(const QString &file_path, int row_num,unsigned int ip_addr)
 {
-    Mat src = imread(file_path.toStdString().c_str());
-    imshow("aaa",src);
-    waitKey(0);
-    CPlateRecognize pr;
+    qDebug()<<file_path.toStdString().c_str();
+    cv::Mat src = cv::imread(file_path.toStdString().c_str());
+    easypr::CPlateRecognize pr;
     QString res;
-    pr.setDetectType(PR_DETECT_CMSER|PR_DETECT_COLOR|PR_DETECT_SOBEL);
-    vector<CPlate> plateVec;
+    pr.setDetectType(easypr::PR_DETECT_CMSER|easypr::PR_DETECT_COLOR|easypr::PR_DETECT_SOBEL);
+    vector<easypr::CPlate> plateVec;
     pr.setResultShow(false);
-    int result = pr.plateRecognize(src,plateVec);
+    //int result = pr.plateRecognize(src,plateVec);
     if(plateVec.size()>0)
     {
-        CPlate plate = plateVec[0];
-        res =  QString::fromLocal8Bit(plate.getPlateStr().substr(3,7).c_str());
+        easypr::CPlate plate = plateVec[0];
+        res =  QString::fromLocal8Bit(plate.getPlateStr().substr(3,10).c_str());
     }
     else
     {
@@ -57,6 +56,7 @@ void ShowPicture::recognize(const QString &file_path, int row_num)
     qDebug()<<QString("结果： ")<<res;
     license.insert(make_pair(row_num,res));
     path.insert(make_pair(row_num,file_path));
+    row_ip.insert(make_pair(row_num,ip_addr));
 }
 
 ShowPicture::~ShowPicture()
@@ -67,8 +67,11 @@ ShowPicture::~ShowPicture()
 void ShowPicture::myshow(int row_num)
 {
     ShowPicture::row_num = row_num;
+    ui->label->setScaledContents(true);
     ui->label->setPixmap(path[row_num]);
+    qDebug()<<path[row_num];
     ui->lineEdit->setText(license[row_num]);
+    qDebug()<<license[row_num];
     this->show();
 }
 
@@ -76,9 +79,20 @@ void ShowPicture::check_out()
 {
     final_res[row_num] = ui->lineEdit_2->text();
     QSqlQuery query;
-    query.exec(QString("insert into picture values(,%1,%2)").arg(final_res[row_num]).arg(path[row_num]));
+    query.exec(QString("insert into picture(license,picture_path) values('%1','%2')").arg(final_res[row_num]).arg(path[row_num]));
     qDebug()<<query.lastError();
     emit has_check(row_num);
+    extern unordered_map<unsigned int,User_Detail> user_map;
+    User_Detail detail = user_map[row_ip[row_num]];
+    if(!detail.user_flag)
+    {
+        emit car_in(final_res[row_num],detail.user_addr,QDateTime::fromString(path[row_num].split('.').at(0).right(17),"yyyyMMddhhmmsszzz"));
+    }
+    else
+    {
+        emit car_out(final_res[row_num],detail.user_addr,QDateTime::fromString(path[row_num].split('.').at(0).right(17),"yyyyMMddhhmmsszzz"));
+    }
+    this->close();
 
 }
 

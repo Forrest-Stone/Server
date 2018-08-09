@@ -5,7 +5,6 @@
 
 #include <QDialog>
 #include <QtCharts>
-#include <QtCharts/QChart>
 
 namespace Ui {
 class Count_Dialog;

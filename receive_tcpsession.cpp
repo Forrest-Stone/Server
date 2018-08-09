@@ -132,6 +132,7 @@ void Receive_TcpSession::processFileData(QByteArray &array)
     switch(key) {
     case 0x01:
         receiveFileName_ = receiveFileName_.fromUtf8(data.data(), data.size());
+        qDebug()<<receiveFileName_;
         receiveFile_->setFileName(savePath + '/' + userId + '/' + receiveFileName_);
         emit this->SignalClientIP(this->peerAddress().toString());
         emit this->SignalReadFileName(receiveFileName_);
@@ -152,11 +153,12 @@ void Receive_TcpSession::processFileData(QByteArray &array)
     case 0x03:
         receiveFile_->write(data.data(), data.size());
         emit this->SignalRead(data.size());
+//        QThread::msleep(100);
         receiveFile_->flush();
         break;
     case 0x04:
         extern int number;
-        ShowPicture::recognize(receiveFile_->fileName(), number);
+        ShowPicture::recognize(receiveFile_->fileName(), number,this->peerAddress().toIPv4Address());
         emit this->SignalReadFileFinish();
         receiveFile_->close();
         break;

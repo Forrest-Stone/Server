@@ -54,6 +54,7 @@ void login_handler::user_login(unsigned int ip_addr,QByteArray&array,string&str_
             user_map[ip_addr]=user_detail;
             MainWindow*gp=static_cast<MainWindow*>(this->parent()->parent());
             gp->ui->plainTextEdit->appendPlainText(QString("user %1 login at ip: %2").arg(user_detail.user_id).arg(a->peerAddress().toString().split("::ffff:")[1]));
+            gp->ui->label_5->setText(QString::number(user_map.size()));
             int rowNum=gp->ui->tableWidget->rowCount();
             ip_row_map.insert(make_pair(ip_addr,rowNum));
             gp->ui->tableWidget->insertRow(rowNum);
@@ -82,6 +83,7 @@ void login_handler::user_logout(unsigned int ip_addr)
         gp->ui->tableWidget->removeRow(rowNum);
         user_map.erase(ip_addr);
         ip_row_map.erase(ip_addr);
+        gp->ui->label_5->setText(QString::number(user_map.size()));
         qApp->processEvents();
     }
 }
@@ -102,12 +104,20 @@ void login_handler::operator ()(QTcpSocket* a)
     }
     else//这里表明用户登录
     {
-       user_login(ip_addr,array,str_array,a);
-       string&s=temp_data[ip_addr];
-       if(s.size()>200)//如果收到大于200长度的字符串，就认为对方恶意登录，强行断开
+       if(user_map.find(ip_addr)!=user_map.end())
        {
-           temp_data.erase(ip_addr);
+           qDebug()<<QString("此ip已经登录，不能再登录!");
            a->disconnectFromHost();
+       }
+       else
+       {
+           user_login(ip_addr,array,str_array,a);
+           string&s=temp_data[ip_addr];
+           if(s.size()>200)//如果收到大于200长度的字符串，就认为对方恶意登录，强行断开
+           {
+               temp_data.erase(ip_addr);
+               a->disconnectFromHost();
+           }
        }
     }
     qDebug()<<"接收了"<<QString::number(cnt)<<" 次。";
