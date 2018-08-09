@@ -23,7 +23,10 @@
 #include "user_detail.h"
 #include "showpicture.h"
 #include "connection.h"
+<<<<<<< HEAD
 
+=======
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
 #include "count_dialog.h"
 
 using namespace std;
@@ -31,6 +34,7 @@ using namespace cv;
 
 unordered_map<unsigned int,User_Detail> user_map;
 QString savePath;
+int number;
 
 int main(int argc, char *argv[])
 {
@@ -39,13 +43,25 @@ int main(int argc, char *argv[])
     createConnection();
     createTables();
     MainWindow w;
+<<<<<<< HEAD
     Count_Dialog d;
     d.show();
+=======
+
+    createConnection();
+    createTables();
+
+//    Count_Dialog d;
+//    d.show();
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
 //    ShowPicture ss;
 //    ss.show();
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
     return a.exec();
 }
