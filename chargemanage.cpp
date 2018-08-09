@@ -82,7 +82,7 @@ void ChargeManage::carOut(QString carID, int outAddrID, QDateTime outTime)
     }
 }
 
-// 统计车流量
+// 统计进站车流量
 int ChargeManage::carsFlow(QDateTime start, QDateTime end, QString addr)
 {
     int flow = 0;
@@ -99,7 +99,25 @@ int ChargeManage::carsFlow(QDateTime start, QDateTime end, QString addr)
     }
     if (query.next()) {
         flow = query.value(0).toInt();
-        qDebug() << "traffic flow: " << flow;
+        // qDebug() << "traffic flow: " << flow;
+    }
+    return flow;
+}
+
+// 统计出站车流量
+int ChargeManage::carsFlowOut(QDateTime start, QDateTime end, QString addr)
+{
+    int flow = 0;
+    QSqlQuery query;
+    QString startStr = start.toString("yyyy-MM-dd hh:mm:ss");
+    QString endStr = end.toString("yyyy-MM-dd hh:mm:ss");
+
+    query.exec(QString("select count(*) from Charge_record "
+                       "where outAddr='%1' and outTime between '%2' and '%3'").arg(
+                   addr, startStr, endStr));
+    if (query.next()) {
+        flow = query.value(0).toInt();
+        // qDebug() << "traffic flow: " << flow;
     }
     return flow;
 }
