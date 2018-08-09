@@ -154,6 +154,9 @@ void Receive_TcpSession::processFileData(QByteArray &array)
         receiveFile_->flush();
         break;
     case 0x04:
+        extern int number;
+//        ShowPicture::recognize(receiveFile_->fileName(), number);
+        emit this->SignalReadFileFinish();
         receiveFile_->close();
         break;
     }

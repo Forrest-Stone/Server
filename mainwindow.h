@@ -54,8 +54,6 @@ public:
     void AcceptSession(std::shared_ptr<Receive_TcpSession> &tcpSession);
 
 public slots:
-    void SlotChangeRecState(int row_num);
-
     QString GetFileSavePath();
     void sendFileSavePath();
 
@@ -73,6 +71,7 @@ private slots:
     void SlotReadFilePath(QString path);
     void SlotReadFileSize(qint64 size);
 
+    void SlotReadFinish();
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;
@@ -81,7 +80,9 @@ private:
     SessionInfoList sessionList_;
     void Write(const QString &msg);
     QString GetHostIpAddr();
-    QProgressBar *progressBar;
+    QProgressBar *progressBar_;
+    qint64 receiveSize_;
+    qint64 totalSize_;
 };
 
 #endif // MAINWINDOW_H

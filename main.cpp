@@ -23,12 +23,14 @@
 #include "user_detail.h"
 #include "showpicture.h"
 #include "connection.h"
+#include "count_dialog.h"
 
 using namespace std;
 using namespace cv;
 
 unordered_map<unsigned int,User_Detail> user_map;
 QString savePath;
+int number;
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +40,14 @@ int main(int argc, char *argv[])
 
     createConnection();
     createTables();
+
+//    Count_Dialog d;
+//    d.show();
+//    ShowPicture ss;
+//    ss.show();
+
+    //createConnection();
+    //createTables();
 
     return a.exec();
 }

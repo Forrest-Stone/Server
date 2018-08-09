@@ -1,7 +1,7 @@
 ﻿#include "showpicture.h"
 #include "ui_showpicture.h"
 #include "opencv2/opencv.hpp"
-#include "easypr.h"
+#include "easypr.h" 
 #include "mainwindow.h"
 #include <QMessageBox>
 #include <QSqlDatabase>
@@ -23,7 +23,7 @@ ShowPicture::ShowPicture(QWidget *parent) :
     ui->lineEdit->setFocusPolicy(Qt::NoFocus);
     ui->lineEdit_2->setMaxLength(7);
     ui->pushButton_3->setEnabled(false);
-    connect(this,SIGNAL(has_check(int)),static_cast<MainWindow*>(this->parent()),SLOT(SlotChangeRecState(int)));
+//    connect(this,SIGNAL(has_check(int)),static_cast<MainWindow*>(this->parent()),SLOT(SlotChangeRecState(int)));
 //    ui->label->show();
 
 //    QPixmap pixmap(normalIcon);

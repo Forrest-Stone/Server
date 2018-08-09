@@ -167,7 +167,7 @@ QHeaderView::section {
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -176,6 +176,37 @@ QHeaderView::section {
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QPlainTextEdit" name="plainTextEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>客户端连接状态</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QTableWidget" name="tableWidget">
+          <column>
+           <property name="text">
+            <string>客户端IP</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>客户ID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>客户地址</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>客户进出flag</string>
+           </property>
+          </column>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -219,37 +250,6 @@ QHeaderView::section {
           <column>
            <property name="text">
             <string>是否校验</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>客户端连接状态</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QTableWidget" name="tableWidget">
-          <column>
-           <property name="text">
-            <string>客户端IP</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>客户ID</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>客户地址</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>客户进出flag</string>
            </property>
           </column>
          </widget>

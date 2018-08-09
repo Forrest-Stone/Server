@@ -1,9 +1,10 @@
-#ifndef COUNT_DIALOG_H
+﻿#ifndef COUNT_DIALOG_H
 #define COUNT_DIALOG_H
 
 #pragma execution_character_set("utf-8")
 #include <QDialog>
 #include <QtCharts>
+#include <QtCharts/QChart>
 
 namespace Ui {
 class Count_Dialog;
@@ -48,6 +49,8 @@ private:
     void New_barChart_YAaxis(int,int);
     void New_barSeries(const QDateTime &,const QDateTime &);
 
+    //判断要显示的格式，年月日
+    int Time_Format(const QDateTime &,const QDateTime &,int &);
 };
 
 #endif // COUNT_DIALOG_H
