@@ -34,16 +34,26 @@ ShowPicture::ShowPicture(QWidget *parent) :
 //    ui->label_4->setStyleSheet("QLabel{border-image:url(:/DSCF2912111.jpg)}");
 }
 
-void ShowPicture::recognize(QString& file_path, int row_num)
+void ShowPicture::recognize(const QString &file_path, int row_num)
 {
     Mat src = imread(file_path.toStdString().c_str());
+    imshow("aaa",src);
+    waitKey(0);
     CPlateRecognize pr;
+    QString res;
     pr.setDetectType(PR_DETECT_CMSER|PR_DETECT_COLOR|PR_DETECT_SOBEL);
     vector<CPlate> plateVec;
     pr.setResultShow(false);
     int result = pr.plateRecognize(src,plateVec);
-    CPlate plate = plateVec[0];
-    QString res =  QString::fromLocal8Bit(plate.getPlateStr().substr(3,7).c_str());
+    if(plateVec.size()>0)
+    {
+        CPlate plate = plateVec[0];
+        res =  QString::fromLocal8Bit(plate.getPlateStr().substr(3,7).c_str());
+    }
+    else
+    {
+        res = QString("无法识别");
+    }
     qDebug()<<QString("结果： ")<<res;
     license.insert(make_pair(row_num,res));
     path.insert(make_pair(row_num,file_path));
@@ -56,7 +66,7 @@ ShowPicture::~ShowPicture()
 
 void ShowPicture::myshow(int row_num)
 {
-    row_num = row_num;
+    ShowPicture::row_num = row_num;
     ui->label->setPixmap(path[row_num]);
     ui->lineEdit->setText(license[row_num]);
     this->show();

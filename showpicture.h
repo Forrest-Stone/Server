@@ -15,7 +15,7 @@ class ShowPicture : public QDialog
 
 public:
     explicit ShowPicture(QWidget *parent = 0);
-    static void recognize(QString &file_path, int row_num);
+    static void recognize(const QString &file_path, int row_num);
     ~ShowPicture();
 
     void myshow(int row_num);

@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_2->setPlaceholderText(QString::number(PORTNUM));
     ui->lineEdit_3->setPlaceholderText(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
     ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
+    ui->tableWidget_2->setEditTriggers(QTableWidget::NoEditTriggers);
+    ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
     sp = new ShowPicture(this);
@@ -217,11 +219,14 @@ void MainWindow::SlotReadConnect(QString info)
 void MainWindow::SlotReadClient(QString client)
 {
     extern int number;
-
+    progressBar_ = new QProgressBar;
+    progressBar_->setRange(0, 100);
+    progressBar_->setValue(0);
     int rowNum = ui->tableWidget_2->rowCount();
     number = rowNum;
     ui->tableWidget_2->insertRow(rowNum);
     ui->tableWidget_2->setItem(rowNum, 0, new QTableWidgetItem(client));
+    ui->tableWidget_2->setCellWidget(rowNum, 3, progressBar_);
     ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("否"));
     ui->tableWidget_2->setItem(rowNum, 6, new QTableWidgetItem("否"));
     QString clietInfo = QString("客户端IP：" + client);
@@ -246,23 +251,29 @@ void MainWindow::SlotReadFileSize(qint64 size)
 {
     int rowNum = ui->tableWidget_2->rowCount() - 1;
     ui->tableWidget_2->setItem(rowNum, 2, new QTableWidgetItem(QString::number(size)));
+    receiveSize_ = 0;
     totalSize_ = size;
+    progressBar_->setRange(0, size - 1);
+    progressBar_->setValue(0);
 }
 
 
 void MainWindow::SlotRead(qint64 size)
 {
-    int rowNum = ui->tableWidget_2->rowCount() - 1;
-    progressBar_ = new QProgressBar;
-    ui->tableWidget_2->setCellWidget(rowNum, 3, progressBar_);
-    progressBar_->setMaximum(totalSize_);
-    progressBar_->setValue(size);
-    receiveSize_ = size;
-    qDebug() << size;
+    receiveSize_ += size;
+    progressBar_->setValue(receiveSize_);
+    qDebug() << QString("当前数据包大小:%1字节 已接收字节:%2 总共字节:%3")
+                .arg(size).arg(receiveSize_).arg(totalSize_);
 }
 
 void MainWindow::SlotReadFinish()
 {
     int rowNum = ui->tableWidget_2->rowCount() - 1;
+    progressBar_->setValue(100);
     ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("是"));
+}
+
+void MainWindow::on_tableWidget_2_doubleClicked(const QModelIndex &index)
+{
+    sp->myshow(index.row());
 }

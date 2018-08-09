@@ -23,7 +23,7 @@
 #include <QCoreApplication>
 
 #include "receive_tcpthread.h"
-//#include "showpicture.h"
+#include "showpicture.h"
 
 class Receive_TcpSession : public QTcpSocket
 {

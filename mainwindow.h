@@ -72,6 +72,9 @@ private slots:
     void SlotReadFileSize(qint64 size);
 
     void SlotReadFinish();
+//    void SlotUpdatePBar(qint64 size);
+    void on_tableWidget_2_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
     Receive_TcpServer *server_ = nullptr;

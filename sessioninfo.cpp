@@ -17,8 +17,6 @@ SessionInfo::SessionInfo(std::shared_ptr<Receive_TcpSession> &session)
             this, &SessionInfo::SlotReadFilePath);
     connect(this->session_.get(), &Receive_TcpSession::SignalReadFileSize,
             this, &SessionInfo::SlotReadFileSize);
-    connect(this->session_.get(), &Receive_TcpSession::SignalReadFile,
-            this, &SessionInfo::SlotRead);
     connect(this->session_.get(), &Receive_TcpSession::SignalReadFileFinish,
             this, &SessionInfo::SlotReadFinish);
 }
@@ -42,8 +40,6 @@ SessionInfo::~SessionInfo()
                this, &SessionInfo::SlotReadFilePath);
     disconnect(this->session_.get(), &Receive_TcpSession::SignalReadFileSize,
                this, &SessionInfo::SlotReadFileSize);
-    disconnect(this->session_.get(), &Receive_TcpSession::SignalReadFile,
-               this, &SessionInfo::SlotRead);
     disconnect(this->session_.get(), &Receive_TcpSession::SignalReadFileFinish,
                this, &SessionInfo::SlotReadFinish);
     this->session_ = nullptr;

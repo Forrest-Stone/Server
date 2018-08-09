@@ -100,8 +100,8 @@ void Receive_TcpSession::SlotStartRead()
         if(this->bytesAvailable() < blockSize_) {
             return ;
         }
-        qDebug() << blockSize_ + sizeof(qint64);
-        emit this->SignalReadFile(blockSize_ + sizeof(qint64));
+        //        qDebug() << blockSize_ + sizeof(qint64);
+        //        emit this->SignalRead(blockSize_ + sizeof(qint64));
         QByteArray data = this->read(blockSize_);
         processFileData(data);
         blockSize_ = 0;
@@ -151,11 +151,12 @@ void Receive_TcpSession::processFileData(QByteArray &array)
     }
     case 0x03:
         receiveFile_->write(data.data(), data.size());
+        emit this->SignalRead(data.size());
         receiveFile_->flush();
         break;
     case 0x04:
         extern int number;
-//        ShowPicture::recognize(receiveFile_->fileName(), number);
+        ShowPicture::recognize(receiveFile_->fileName(), number);
         emit this->SignalReadFileFinish();
         receiveFile_->close();
         break;
