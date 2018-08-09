@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
     login= new Server_Login_Dialog(this);
     server_ = new Receive_TcpServer(this);
-    sp = new ShowPicture(this);
+    //sp = new ShowPicture(this);
     server_->OnAccepted = std::bind(&MainWindow::AcceptSession, this, std::placeholders::_1);
     connect(server_, &Receive_TcpServer::SignalReadConnect,
             this, &MainWindow::SlotReadConnect);
@@ -268,9 +268,13 @@ void MainWindow::SlotRead(qint64 size)
 
 void MainWindow::SlotReadFinish()
 {
+<<<<<<< HEAD
+   // ui->treeWidget->itemAt(row_num,0)->setText(6,QString(QString("是")));
+=======
     int rowNum = ui->tableWidget_2->rowCount() - 1;
     progressBar_->setValue(100);
     ui->tableWidget_2->setItem(rowNum, 5, new QTableWidgetItem("是"));
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
 }
 
 void MainWindow::on_tableWidget_2_doubleClicked(const QModelIndex &index)

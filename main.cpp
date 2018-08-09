@@ -23,6 +23,10 @@
 #include "user_detail.h"
 #include "showpicture.h"
 #include "connection.h"
+<<<<<<< HEAD
+
+=======
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
 #include "count_dialog.h"
 
 using namespace std;
@@ -36,18 +40,28 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    createConnection();
+    createTables();
     MainWindow w;
+<<<<<<< HEAD
+    Count_Dialog d;
+    d.show();
+=======
 
     createConnection();
     createTables();
 
 //    Count_Dialog d;
 //    d.show();
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
 //    ShowPicture ss;
 //    ss.show();
 
-    //createConnection();
-    //createTables();
 
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> a31475f48694c8283e3260b8c97e355b2485d4a1
     return a.exec();
 }
